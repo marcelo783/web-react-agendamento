@@ -6,7 +6,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   
- // withCredentials: true, // Necessário para enviar cookies e lidar com autenticações que requerem credenciais
+  withCredentials: true, // Necessário para enviar cookies e lidar com autenticações que requerem credenciais
 });
 
 export default api;
