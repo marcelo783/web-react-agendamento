@@ -9,7 +9,7 @@ const Adm: React.FC = () => {
 
   return (
     <div className="flex">
-      <Sidebar />
+     
       <div className="flex-1 p-4">
         <h1>Administração</h1>
         <button

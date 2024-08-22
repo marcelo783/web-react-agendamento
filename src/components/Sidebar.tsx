@@ -23,7 +23,7 @@ const menuItems: MenuItem[] = [
   {
     icons: <IoIosAddCircle size={20} />,
     label: "Criar",
-    path: "/create",
+    path: "/create-event",
   },
   {
     icons: <FaCalendarDays size={20} />,

@@ -6,24 +6,34 @@ import Register from './screens/Register';
 import Adm from './screens/Adm';
 import PrivateRoute from './routes/PrivateRoute'; // Importe o componente de rota privada
 import Login from './screens/Login';
+import CreatEvent from './screens/CreateEvent';
+import Sidebar from './components/Sidebar';
+
 
 const App: React.FC = () => {
+
+
   return (
     <Router>
+
+    <div className='flex'>
+      <Sidebar/>
+
+      <div className='flex-1'>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<PrivateRoute><Register /></PrivateRoute>}/>
+        <Route path="/create-event" element={<PrivateRoute><CreatEvent /></PrivateRoute>}/>
        
-        <Route
-          path="/adm"
-          element={
-            <PrivateRoute>
-              <Adm />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/adm" element={<PrivateRoute><Adm /></PrivateRoute>}/>
       </Routes>
+
+      </div>
+
+    </div>
+
+      
     </Router>
   );
 };
