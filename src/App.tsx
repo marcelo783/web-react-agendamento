@@ -8,6 +8,8 @@ import PrivateRoute from './routes/PrivateRoute'; // Importe o componente de rot
 import Login from './screens/Login';
 import CreatEvent from './screens/CreateEvent';
 import Sidebar from './components/Sidebar';
+import EventList from './screens/EventList';
+
 
 
 const App: React.FC = () => {
@@ -25,8 +27,8 @@ const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<PrivateRoute><Register /></PrivateRoute>}/>
         <Route path="/create-event" element={<PrivateRoute><CreatEvent /></PrivateRoute>}/>
-       
         <Route path="/adm" element={<PrivateRoute><Adm /></PrivateRoute>}/>
+        <Route path="/EventList" element={<EventList />}/>
       </Routes>
 
       </div>

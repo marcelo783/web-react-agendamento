@@ -12,8 +12,9 @@ import { useCookies } from 'react-cookie';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Label } from "@/components/ui/label";
-import Input from "@/components/ui/input";
+
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const Register = () => {
   const [cookies, setCookie] = useCookies(['authToken']);
@@ -35,13 +36,16 @@ const Register = () => {
       console.log('Tentativa de leitura do authToken:', cookies.authToken);
 
       if (!cookies.authToken) {
-        navigate('/login');
+        navigate('/login');  // Redireciona para login se não houver token
       } else {
         console.log('Token encontrado após nova leitura:', cookies.authToken);
       }
     };
 
-    // Espera 200ms e verifica novamente
+    // Verifica imediatamente
+    checkAuthToken();
+
+    // Define um timeout para a verificação futura, se necessário
     const timeout = setTimeout(checkAuthToken, 200);
 
     return () => clearTimeout(timeout);
@@ -55,6 +59,14 @@ const Register = () => {
       [name]: value,
     });
   };
+
+  const handleCheckboxChange = (checked, name) => {
+  setFormData((prevState) => ({
+    ...prevState,
+    [name]: checked,
+  }));
+};
+
 
   // Função de submissão do formulário
   const handleSubmit = async (e) => {

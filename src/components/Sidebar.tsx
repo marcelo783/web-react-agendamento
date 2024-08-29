@@ -27,8 +27,8 @@ const menuItems: MenuItem[] = [
   },
   {
     icons: <FaCalendarDays size={20} />,
-    label: "calendar",
-    path: "/calendar",
+    label: "EventList",
+    path: "/EventList",
   },
   {
     icons: <FaProductHunt size={20} />,
