@@ -33,7 +33,7 @@ const menuItems: MenuItem[] = [
   {
     icons: <FaProductHunt size={20} />,
     label: "setting",
-    path: "/settings",
+    path: "/DataTest",
   },
   {
     icons: <FaProductHunt size={20} />,
@@ -47,8 +47,8 @@ export default function Sidebar() {
 
   return (
     <nav
-      className={`shadow-md h-screen p-2 flex flex-col duration-500 bg-blue-600 text-white ${
-        open ? "w-60" : "w-16"
+      className={`shadow-md h-screen p-2 flex flex-col duration-500  bg-blue-600  text-white sticky top-0 ${
+        open ? "w-56" : "w-16"
       }`}
     >
       <div className="border px-3 py-2 h-20 flex justify-between items-center">
@@ -68,9 +68,7 @@ export default function Sidebar() {
       <ul className="flex-1">
         {menuItems.map((item, index) => (
           <Link to={item.path} key={index}>
-            <li
-              className="px-3 py-2 my-2 hover:bg-blue-800 rounded-md duration-300 cursor-pointer flex gap-2 items-center relative group"
-            >
+            <li className="px-3 py-2 my-2 hover:bg-blue-800 rounded-md duration-300 cursor-pointer flex gap-2 items-center relative group">
               <div>{item.icons}</div>
               <p
                 className={`${
