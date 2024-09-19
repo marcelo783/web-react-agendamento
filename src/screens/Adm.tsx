@@ -5,6 +5,8 @@ import CardAdm from '@/components/CardAdm'; // Importando o componente
 import HorizontalCalendar from '@/components/HorizontalCalendar';
 import Pagination from '@/components/ui/pagination';
 
+
+
 const ITEMS_PER_PAGE = 6; // Quantidade de cards por página
 
 const Adm: React.FC = () => {
@@ -18,32 +20,35 @@ const Adm: React.FC = () => {
   const fetchEvents = async (searchTerm = '', selectedDate = null) => {
     try {
       let endpoint = 'http://localhost:5000/agendamentos';
-
       const params = [];
+  
       if (searchTerm) params.push(`titulo=${searchTerm}`);
       if (selectedDate) params.push(`data=${selectedDate}`);
-
       if (params.length > 0) {
         endpoint += `?${params.join('&')}`;
       }
-
-      const response = await axios.get(endpoint);
+  
+      // Agora usamos withCredentials para incluir cookies automaticamente
+      const response = await axios.get(endpoint, { withCredentials: true });
       setEvents(response.data);
     } catch (error) {
       console.error('Erro ao buscar eventos:', error);
     }
   };
-
-  // Função para buscar os dados do paciente pelo ID
+  
+  // Também aplique essa configuração em outras chamadas axios
   const fetchPacienteById = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:5000/pacientes/${id}`);
-      return response.data.nome;  // Supondo que a resposta contenha o nome do paciente
+      const response = await axios.get(`http://localhost:5000/pacientes/${id}`, {
+        withCredentials: true,
+      });
+      return response.data.nome;
     } catch (error) {
       console.error('Erro ao buscar o paciente:', error);
       return 'Paciente não encontrado';
     }
   };
+  
   
 
   // Efeito para buscar os eventos ao carregar a página
@@ -110,26 +115,35 @@ const Adm: React.FC = () => {
 
       {/* Segunda Div: Cards, agora posicionados abaixo do input e do calendário */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {selectedEvents.length > 0 ? (
-          selectedEvents.map((event) => (
-            <CardAdm
-              key={event.id}
-              titulo={event.titulo}
-              descricao={event.descricao}
-              paciente={event.paciente ? (pacientes[event.paciente] || 'Carregando...') : 'ID não disponível'}
-              formatoConsulta={event.formatoConsulta}
-              status={event.status}
-              data={new Date(event.disponibilidade[0].dia).toLocaleDateString()}
-              inicio={event.disponibilidade[0].horarios[0]?.inicio || 'N/A'}
-              fim={event.disponibilidade[0].horarios[0]?.fim || 'N/A'}
-              duracao={event.disponibilidade[0].horarios[0]?.duracao || 'N/A'}
-              valor={event.valor}
-            />
-          ))
-        ) : (
-          <p>Nenhum evento encontrado.</p>
-        )}
-      </div>
+  {selectedEvents.length > 0 ? (
+    selectedEvents.map((event, index) => {
+      // Verifica o conteúdo de cada evento aqui
+
+      return (
+        <CardAdm
+        key={event._id || index}  // Use _id
+        _id={event._id}
+        googleCalendarId={event.googleCalendarId}  // Passe _id corretamente para o CardAdm
+          titulo={event.titulo}
+          descricao={event.descricao}
+          paciente={event.paciente ? (pacientes[event.paciente] || 'Carregando...') : 'ID não disponível'}
+          formatoConsulta={event.formatoConsulta}
+          status={event.status}
+          data={new Date(event.disponibilidade[0].dia).toLocaleDateString()}
+          inicio={event.disponibilidade[0].horarios[0]?.inicio || 'N/A'}
+          fim={event.disponibilidade[0].horarios[0]?.fim || 'N/A'}
+          duracao={event.disponibilidade[0].horarios[0]?.duracao || 'N/A'}
+          valor={event.valor}
+        />
+      );
+    })
+  ) : (
+    <p>Nenhum evento encontrado.</p>
+  )}
+</div>
+
+   
+      
 
        {/* Utilizando o novo componente de paginação */}
        <Pagination

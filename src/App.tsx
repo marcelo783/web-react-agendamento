@@ -10,6 +10,8 @@ import CreatEvent from './screens/CreateEvent';
 import Sidebar from './components/Sidebar';
 import EventList from './screens/EventList';
 import HorizontalCalendar from './components/HorizontalCalendar';
+import EditEvent from './screens/EditEvent';
+
 
 
 
@@ -30,6 +32,8 @@ const App: React.FC = () => {
         <Route path="/create-event" element={<PrivateRoute><CreatEvent /></PrivateRoute>}/>
         <Route path="/adm" element={<PrivateRoute><Adm /></PrivateRoute>}/>
         <Route path="/EventList" element={<EventList />}/>
+        <Route path="/edit-event/:googleCalendarId" element={<PrivateRoute><EditEvent /></PrivateRoute>} /> 
+
         <Route path="DataTest" element={<HorizontalCalendar />}/>
       </Routes>
 
