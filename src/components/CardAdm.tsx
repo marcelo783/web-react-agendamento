@@ -68,7 +68,8 @@ const CardAdm: React.FC<CardAdmProps> = ({
   return (
     <div className="relative p-4 border rounded shadow-md w-88">
 
-
+{/* Linha colorida na parte superior do card */}
+<div className={`w-full h-1 ${borderColor} absolute top-0 left-0 rounded-t`} />
       {/* Dropdown Menu de configurações */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

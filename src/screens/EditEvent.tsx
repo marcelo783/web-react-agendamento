@@ -11,17 +11,20 @@ import accessToken from "@/cookies/appAccessToken";
 
 const EditEvent = () => {
   const { googleCalendarId } = useParams(); // Captura o googleCalendarId da URL
-// Captura o googleCalendarId da URL
+  // Captura o googleCalendarId da URL
   const navigate = useNavigate();
-  const [cookies] = useCookies([accessToken]); // Acessa o accessToken dos cookies
+  const [cookies] = useCookies(["accessToken"]); // Acessa o accessToken dos cookies
 
   const [formData, setFormData] = useState({
     agendamentoId: "", // Armazena o agendamentoId do backend
     titulo: "",
     descricao: "",
+    pacienteEmail: "",
     formatoConsulta: "online",
     valor: "",
-    disponibilidade: [{ dia: null, horarios: [{ inicio: "", fim: "", duracao: 0 }] }],
+    disponibilidade: [
+      { dia: null, horarios: [{ inicio: "", fim: "", duracao: 0 }] },
+    ],
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,17 +42,21 @@ const EditEvent = () => {
         console.error("ID do evento não encontrado");
         return;
       }
-  
+
       try {
         // Agora, enviamos o cookie automaticamente
-        const response = await axios.get(`http://localhost:5000/agendamentos/googleCalendar/${googleCalendarId}`, {
-          withCredentials: true,  // Inclui o cookie na requisição
-        });
-  
+        const response = await axios.get(
+          `http://localhost:5000/agendamentos/googleCalendar/${googleCalendarId}`,
+          {
+            withCredentials: true, // Inclui o cookie na requisição
+          }
+        );
+
         setFormData({
           agendamentoId: response.data._id,
           titulo: response.data.titulo,
           descricao: response.data.descricao,
+          pacienteEmail: response.data.pacienteEmail || "",
           formatoConsulta: response.data.formatoConsulta,
           valor: response.data.valor,
           disponibilidade: response.data.disponibilidade,
@@ -58,29 +65,49 @@ const EditEvent = () => {
         console.error("Erro ao buscar o agendamento", error);
       }
     };
-  
+
     fetchEventData();
   }, [googleCalendarId]);
-  
-  
+
+  // Função para validar a data
+  const isDateValid = (dateStr) => {
+    return /^\d{4}-\d{2}-\d{2}$/.test(dateStr); // Verifica formato 'YYYY-MM-DD'
+  };
+
+  // Função para validar o horário
+  const isTimeValid = (timeStr) => {
+    return /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/.test(timeStr); // Verifica formato 'HH:MM'
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
-  
+
+    // Verifica se o token foi definido corretamente
+    const token = cookies.accessToken;
+    if (!token) {
+      console.error("AccessToken não encontrado.");
+      return;
+    }
+
+    // Validação do e-mail do paciente
+    if (!formData.pacienteEmail || !formData.pacienteEmail.includes("@")) {
+      console.error("E-mail do paciente inválido.");
+      return;
+    }
+
+    // Envia o token no header Authorization
     try {
-      // Atualiza o evento no Google Calendar usando o googleCalendarId
-      await axios.patch(
+      await axios.put(
         `http://localhost:5000/calendar/event/${googleCalendarId}`,
-        formData,
-        { withCredentials: true }  // Cookie incluído na requisição
+        formData, // Inclui o `pacienteEmail` no objeto enviado
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-  
-      // Atualiza o evento no backend usando o agendamentoId
-      await axios.patch(
-        `http://localhost:5000/agendamentos/${formData.agendamentoId}`,
-        formData,
-        { withCredentials: true }  // Cookie incluído na requisição
-      );
-  
+
       navigate("/adm");
     } catch (error) {
       console.error("Erro ao atualizar o agendamento", error);
@@ -114,6 +141,19 @@ const EditEvent = () => {
                 id="descricao"
                 name="descricao"
                 value={formData.descricao}
+                onChane={handleInputChange}
+                required
+              />
+            </div>
+
+            {/* E-mail do paciente */}
+            <div>
+              <Label htmlFor="pacienteEmail">E-mail do Paciente</Label>
+              <Input
+                id="pacienteEmail"
+                name="pacienteEmail"
+                type="email"
+                value={formData.pacienteEmail}
                 onChange={handleInputChange}
                 required
               />
@@ -168,16 +208,23 @@ const EditEvent = () => {
                   name={`dia-${index}`}
                   value={disp.dia?.slice(0, 10) || ""}
                   onChange={(e) => {
-                    const updatedDisponibilidade = [...formData.disponibilidade];
+                    const updatedDisponibilidade = [
+                      ...formData.disponibilidade,
+                    ];
                     updatedDisponibilidade[index].dia = e.target.value;
-                    setFormData({ ...formData, disponibilidade: updatedDisponibilidade });
+                    setFormData({
+                      ...formData,
+                      disponibilidade: updatedDisponibilidade,
+                    });
                   }}
                 />
 
                 {disp.horarios.map((horario, horarioIndex) => (
                   <div key={horarioIndex} className="grid grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor={`inicio-${index}-${horarioIndex}`}>Início</Label>
+                      <Label htmlFor={`inicio-${index}-${horarioIndex}`}>
+                        Início
+                      </Label>
                       <Input
                         type="time"
                         name={`inicio-${index}-${horarioIndex}`}
@@ -185,14 +232,22 @@ const EditEvent = () => {
                         onChange={(e) => {
                           const updatedHorarios = [...disp.horarios];
                           updatedHorarios[horarioIndex].inicio = e.target.value;
-                          const updatedDisponibilidade = [...formData.disponibilidade];
-                          updatedDisponibilidade[index].horarios = updatedHorarios;
-                          setFormData({ ...formData, disponibilidade: updatedDisponibilidade });
+                          const updatedDisponibilidade = [
+                            ...formData.disponibilidade,
+                          ];
+                          updatedDisponibilidade[index].horarios =
+                            updatedHorarios;
+                          setFormData({
+                            ...formData,
+                            disponibilidade: updatedDisponibilidade,
+                          });
                         }}
                       />
                     </div>
                     <div>
-                      <Label htmlFor={`fim-${index}-${horarioIndex}`}>Fim</Label>
+                      <Label htmlFor={`fim-${index}-${horarioIndex}`}>
+                        Fim
+                      </Label>
                       <Input
                         type="time"
                         name={`fim-${index}-${horarioIndex}`}
@@ -200,14 +255,22 @@ const EditEvent = () => {
                         onChange={(e) => {
                           const updatedHorarios = [...disp.horarios];
                           updatedHorarios[horarioIndex].fim = e.target.value;
-                          const updatedDisponibilidade = [...formData.disponibilidade];
-                          updatedDisponibilidade[index].horarios = updatedHorarios;
-                          setFormData({ ...formData, disponibilidade: updatedDisponibilidade });
+                          const updatedDisponibilidade = [
+                            ...formData.disponibilidade,
+                          ];
+                          updatedDisponibilidade[index].horarios =
+                            updatedHorarios;
+                          setFormData({
+                            ...formData,
+                            disponibilidade: updatedDisponibilidade,
+                          });
                         }}
                       />
                     </div>
                     <div>
-                      <Label htmlFor={`duracao-${index}-${horarioIndex}`}>Duração (min)</Label>
+                      <Label htmlFor={`duracao-${index}-${horarioIndex}`}>
+                        Duração (min)
+                      </Label>
                       <Input
                         type="number"
                         name={`duracao-${index}-${horarioIndex}`}
@@ -220,7 +283,10 @@ const EditEvent = () => {
               </div>
             ))}
 
-            <Button type="submit" className="w-full bg-green-500 hover:bg-green-700">
+            <Button
+              type="submit"
+              className="w-full bg-green-500 hover:bg-green-700"
+            >
               Salvar Alterações
             </Button>
           </form>
