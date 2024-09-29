@@ -6,11 +6,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { FiEdit, FiTrash } from "react-icons/fi"; // Ícones de lápis e lixeira
 import { useNavigate } from "react-router-dom";
 import { useCookies } from 'react-cookie';
-import accessToken from "@/cookies/appAccessToken";
+import axios from "axios";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"; // AlertDialog do Shadcn
+import { useToast } from "@/hooks/use-toast"
+
+
 
 interface CardAdmProps {
-  
-  googleCalendarId: string; 
+  googleCalendarId: string;
   titulo: string;
   descricao: string;
   paciente: string;
@@ -54,22 +57,56 @@ const CardAdm: React.FC<CardAdmProps> = ({
   valor,
 }) => {
   const navigate = useNavigate();
-  const [cookies] = useCookies([accessToken]);
+  const [cookies] = useCookies(['accessToken']);
   const borderColor = getBorderColor(status);
+  const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
+  const { toast } = useToast()
 
   const handleEditClick = () => {
-    // O token será enviado automaticamente pelos cookies
-    console.log("Navigating to edit event with ID:", googleCalendarId); // Verifique o valor de googleCalendarId
-    navigate(`/edit-event/${googleCalendarId}`); // Certifique-se de que o googleCalendarId está correto
+    if (cookies.accessToken) {
+      console.log("Navigating to edit event with ID:", googleCalendarId); // Verifique o valor de googleCalendarId
+      navigate(`/edit-event/${googleCalendarId}`); // Certifique-se de que o googleCalendarId está correto
+    } else {
+      navigate("/login");
+    }
   };
-  
-  
-  
+
+  const handleDeleteClick = async () => {
+    try {
+      const token = cookies.accessToken;
+      if (!token) {
+        console.error("AccessToken não encontrado.");
+        return;
+      }
+
+      await axios.delete(`http://localhost:5000/calendar/event/${googleCalendarId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+    
+      toast({
+        title: "Agendamento deletado",
+        description: "O agendamento foi deletado com sucesso.",
+        status: "success",
+      });
+
+
+      console.log("Agendamento deletado com sucesso");
+      // Aqui você poderia remover o card da interface, caso necessário.
+    } catch (error) {
+      console.error("Erro ao deletar o agendamento", error);
+    } finally {
+      setIsAlertDialogOpen(false); // Fechar o AlertDialog após tentativa de deletar
+    }
+  };
+
   return (
     <div className="relative p-4 border rounded shadow-md w-88">
+      {/* Linha colorida na parte superior do card */}
+      <div className={`w-full h-1 ${borderColor} absolute top-0 left-0 rounded-t`} />
 
-{/* Linha colorida na parte superior do card */}
-<div className={`w-full h-1 ${borderColor} absolute top-0 left-0 rounded-t`} />
       {/* Dropdown Menu de configurações */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -82,12 +119,36 @@ const CardAdm: React.FC<CardAdmProps> = ({
             <FiEdit className="text-gray-600" />
             <span>Editar</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="flex items-center space-x-2 text-red-600">
+          <DropdownMenuItem
+            className="flex items-center space-x-2 text-red-600"
+            onClick={() => setIsAlertDialogOpen(true)}
+          >
             <FiTrash className="text-red-600" />
             <span>Excluir</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* AlertDialog para confirmar exclusão */}
+      <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen}>
+        <AlertDialogTrigger asChild>
+          <div />
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <p className="font-semibold">Confirmar Exclusão</p>
+            <p>Você realmente deseja apagar o agendamento?</p>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsAlertDialogOpen(false)}>
+              Não
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteClick}>
+              Sim, Apagar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Conteúdo do card */}
       <h2 className="text-lg font-semibold text-center mt-4 mb-2">{titulo}</h2>
@@ -102,8 +163,8 @@ const CardAdm: React.FC<CardAdmProps> = ({
         <span>{status}</span>
       </div>
 
-       {/* Data e valor lado a lado */}
-       <div className="flex justify-between items-center text-sm text-gray-800 mb-2">
+      {/* Data e valor lado a lado */}
+      <div className="flex justify-between items-center text-sm text-gray-800 mb-2">
         <div className="flex items-center">
           <AiOutlineCalendar className="mr-2" />
           <span>{data}</span>
@@ -112,7 +173,6 @@ const CardAdm: React.FC<CardAdmProps> = ({
           <span>R$</span> {valor.toFixed(2)}
         </div>
       </div>
-
 
       <div className="flex items-center text-sm text-gray-800">
         <AiOutlineClockCircle className="mr-2" />

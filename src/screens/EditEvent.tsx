@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import { toast } from "@/hooks/use-toast";
 
 const EditEvent = () => {
   const { googleCalendarId } = useParams(); // Captura o googleCalendarId da URL
@@ -208,6 +209,12 @@ const EditEvent = () => {
           },
         }
       );
+
+      toast({
+        title: "Agendamento editado com sucesso",
+        description: "O agendamento foi editado com sucesso.",
+        status: "success",
+      });
   
       navigate("/adm");
     } catch (error) {

@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import axios from "axios"; // Para fazer a requisição
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
+import { toast } from "@/hooks/use-toast";
 
 const CreateEvent = () => {
   const [cookies] = useCookies(["authToken"]); // Obtém o token JWT do cookie
@@ -192,6 +193,12 @@ const CreateEvent = () => {
           },
         }
       );
+
+      toast({
+        title: "Agendamento criado com sucesso",
+        description: "O agendamento foi criado com sucesso.",
+        status: "success",
+      });
 
       console.log("Agendamento criado com sucesso:", response.data);
       // Redirecionar ou realizar outra ação após o sucesso
