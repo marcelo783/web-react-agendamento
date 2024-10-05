@@ -33,6 +33,8 @@ const App: React.FC = () => {
         <Route path="/adm" element={<PrivateRoute><Adm /></PrivateRoute>}/>
         <Route path="/EventList" element={<EventList />}/>
         <Route path="/edit-event/:googleCalendarId" element={<PrivateRoute><EditEvent /></PrivateRoute>} /> 
+        <Route path="/edit-event-id/:id" element={<PrivateRoute><EditEvent /></PrivateRoute>} />
+        
 
         <Route path="DataTest" element={<HorizontalCalendar />}/>
       </Routes>

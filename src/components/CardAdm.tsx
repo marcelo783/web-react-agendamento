@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast"
 
 
 interface CardAdmProps {
+  _id: string;
   googleCalendarId: string;
   titulo: string;
   descricao: string;
@@ -44,6 +45,7 @@ const getBorderColor = (status: string) => {
 };
 
 const CardAdm: React.FC<CardAdmProps> = ({
+  _id,
   googleCalendarId,
   titulo,
   descricao,
@@ -57,42 +59,61 @@ const CardAdm: React.FC<CardAdmProps> = ({
   valor,
 }) => {
   const navigate = useNavigate();
-  const [cookies] = useCookies(['accessToken']);
+  const [cookies] = useCookies(['accessToken', 'authToken']);
+  
   const borderColor = getBorderColor(status);
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
   const { toast } = useToast()
 
   const handleEditClick = () => {
-    if (cookies.accessToken) {
-      console.log("Navigating to edit event with ID:", googleCalendarId); // Verifique o valor de googleCalendarId
-      navigate(`/edit-event/${googleCalendarId}`); // Certifique-se de que o googleCalendarId está correto
+    if (googleCalendarId && googleCalendarId !== "undefined") {
+      navigate(`/edit-event/${googleCalendarId}`);
+    } else if (_id && _id !== "undefined") {
+      navigate(`/edit-event-id/${_id}`);
     } else {
-      navigate("/login");
+      console.error("Nenhum ID válido para editar o evento.");
     }
   };
+  
+  
+  
+  
+  
+  
 
   const handleDeleteClick = async () => {
     try {
-      const token = cookies.accessToken;
+      
+      const token = cookies.authToken;
+      const accessToken = cookies.accessToken;
       if (!token) {
-        console.error("AccessToken não encontrado.");
+        console.error("AuthToken não encontrado.");
         return;
       }
-
-      await axios.delete(`http://localhost:5000/calendar/event/${googleCalendarId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-    
+  
+      if (googleCalendarId) {
+        // Deletar evento no Google Calendar
+        await axios.delete(`http://localhost:5000/calendar/event/${googleCalendarId}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+      } else {
+        //  deletar somente no backend 
+        await axios.delete(`http://localhost:5000/agendamentos/${_id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+  
+      // Mostrar Toast de sucesso
       toast({
         title: "Agendamento deletado",
         description: "O agendamento foi deletado com sucesso.",
         status: "success",
       });
-
-
+  
       console.log("Agendamento deletado com sucesso");
       // Aqui você poderia remover o card da interface, caso necessário.
     } catch (error) {
@@ -101,6 +122,7 @@ const CardAdm: React.FC<CardAdmProps> = ({
       setIsAlertDialogOpen(false); // Fechar o AlertDialog após tentativa de deletar
     }
   };
+  
 
   return (
     <div className="relative p-4 border rounded shadow-md w-88">

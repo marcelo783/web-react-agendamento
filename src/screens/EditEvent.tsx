@@ -11,6 +11,7 @@ import { ptBR } from "date-fns/locale";
 import accessToken from "@/cookies/appAccessToken";
 import { format } from "date-fns";
 import { FaTrashAlt } from "react-icons/fa";
+import { useLocation } from 'react-router-dom';
 import {
   Popover,
   PopoverContent,
@@ -21,12 +22,19 @@ import { Calendar } from "@/components/ui/calendar";
 import { toast } from "@/hooks/use-toast";
 
 const EditEvent = () => {
-  const { googleCalendarId } = useParams(); // Captura o googleCalendarId da URL
+  const { googleCalendarId, _id } = useParams();  // Captura o googleCalendarId da URL
   // Captura o googleCalendarId da URL
+  const { search } = useLocation(); // Captura a parte da query da URL
+  const query = new URLSearchParams(search);
+  const idType = query.get('type'); // 'google' ou 'custom'
+
+  const id = googleCalendarId || _id;
+
   const navigate = useNavigate();
-  const [cookies] = useCookies(["accessToken"]); // Acessa o accessToken dos cookies
+  const [cookies] = useCookies(["accessToken", "authToken"]); // Acessa o accessToken dos cookies
 
   const [formData, setFormData] = useState({
+    _id: "",
     agendamentoId: "", // Armazena o agendamentoId do backend
     titulo: "",
     descricao: "",
@@ -132,24 +140,35 @@ const EditEvent = () => {
 
 
   // Função para buscar os dados do evento (incluindo agendamentoId) ao carregar a página
+  
+ 
   useEffect(() => {
+    console.log("googleCalendarId:", googleCalendarId);
+  console.log("_id:", _id);
     const fetchEventData = async () => {
-      if (!googleCalendarId) {
-        console.error("ID do evento não encontrado");
-        return;
-      }
-
       try {
-        // Agora, enviamos o cookie automaticamente
-        const response = await axios.get(
-          `http://localhost:5000/agendamentos/googleCalendar/${googleCalendarId}`,
-          {
-            withCredentials: true, // Inclui o cookie na requisição
-          }
-        );
-
+        let response;
+  
+        if (googleCalendarId && googleCalendarId !== "undefined") {
+          // Buscar agendamento pelo googleCalendarId
+          response = await axios.get(
+            `http://localhost:5000/agendamentos/googleCalendar/${googleCalendarId}`,
+            { withCredentials: true }
+          );
+        } else if (_id && _id !== "undefined") {
+          // Buscar agendamento pelo _id
+          response = await axios.get(
+            `http://localhost:5000/agendamentos/${_id}`,
+            { withCredentials: true }
+          );
+        } else {
+          console.error("Nenhum ID válido do evento fornecido.");
+          return;
+        }
+  
+        // Atualizar o estado do formulário com os dados obtidos
         setFormData({
-          agendamentoId: response.data._id,
+          _id: response.data._id, 
           titulo: response.data.titulo,
           descricao: response.data.descricao,
           pacienteEmail: response.data.pacienteEmail || "",
@@ -161,9 +180,14 @@ const EditEvent = () => {
         console.error("Erro ao buscar o agendamento", error);
       }
     };
-
+  
     fetchEventData();
-  }, [googleCalendarId]);
+  }, [googleCalendarId, _id]);
+  
+  
+  
+  
+  
 
   
   // Função para salvar os dados atualizados
@@ -171,8 +195,10 @@ const EditEvent = () => {
     e.preventDefault();
   
     const token = cookies.accessToken;
-    if (!token) {
-      console.error("AccessToken não encontrado.");
+    const authToken = cookies.authToken;
+  
+    if (!authToken) {
+      console.error("Token JWT não encontrado.");
       return;
     }
   
@@ -183,33 +209,48 @@ const EditEvent = () => {
           : disp.dia;  // Se já estiver no formato correto, apenas usar
   
         const horarios = disp.horarios.map((horario) => ({
-          inicio: horario.inicio,  // Enviar diretamente no formato "HH:MM"
-          fim: horario.fim,        // Enviar diretamente no formato "HH:MM"
-          duracao: horario.duracao // Duração permanece a mesma
+          inicio: horario.inicio,
+          fim: horario.fim,
+          duracao: horario.duracao,
         }));
   
         return {
-          dia: diaFormatted,  // Garante que 'dia' seja enviado como "YYYY-MM-DD"
-          horarios
+          dia: diaFormatted,
+          horarios,
         };
       });
   
       const updatedData = {
         ...formData,
-        disponibilidade: formattedDisponibilidade
+        disponibilidade: formattedDisponibilidade,
       };
   
-      await axios.put(
-        `http://localhost:5000/calendar/event/${googleCalendarId}`,
-        updatedData,
-        {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      if (googleCalendarId && googleCalendarId !== "undefined") {
+        // Atualizar evento no Google Calendar e backend
+        await axios.put(
+          `http://localhost:5000/calendar/event/${googleCalendarId}`,
+          updatedData,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } else if (_id && _id !== "undefined") {
+        // Atualizar apenas no backend usando _id
+        await axios.patch(
+          `http://localhost:5000/agendamentos/${_id}`,
+          updatedData,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+      }
+  
       toast({
         title: "Agendamento editado com sucesso",
         description: "O agendamento foi editado com sucesso.",
@@ -221,6 +262,8 @@ const EditEvent = () => {
       console.error("Erro ao atualizar o agendamento", error);
     }
   };
+  
+  
   
 
   return (
