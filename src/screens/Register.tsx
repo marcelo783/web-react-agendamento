@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import MainLayout from "@/components/MainLayout";
 
 const Register = () => {
   const [cookies, setCookie] = useCookies(['authToken']);
@@ -97,6 +98,7 @@ const Register = () => {
 
 
   return (
+    <MainLayout>
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 sm:p-8">
       <Card className="w-full max-w-xl">
         <CardHeader>
@@ -145,6 +147,7 @@ const Register = () => {
         </CardContent>
       </Card>
     </div>
+    </MainLayout>
   );
 };
 

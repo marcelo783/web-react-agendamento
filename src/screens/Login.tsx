@@ -1,8 +1,11 @@
 import { authService } from '@/api/auth';
+import Navbar from '@/components/LandingPage/Navbar/Navbar';
 import accessToken from '@/cookies/appAccessToken';
 import authToken from '@/cookies/appCookies';
 import React, { useEffect } from 'react';
 import { useCookies } from 'react-cookie';
+//import { Navbar } from "../components/LandingPage/Navbar/Navbar";
+
 
 const Login = () => {
   const [cookies, setCookie] = useCookies([authToken, accessToken]);
@@ -35,7 +38,9 @@ const Login = () => {
   
 
   return (
+   
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    
       <button
         className="bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         onClick={handleGoogleLogin}
@@ -43,6 +48,7 @@ const Login = () => {
         Login with Google
       </button>
     </div>
+     
   );
 };
 

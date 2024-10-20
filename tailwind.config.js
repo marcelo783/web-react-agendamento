@@ -9,16 +9,23 @@ module.exports = {
   ],
   prefix: "",
   theme: {
-  	container: {
-  		center: 'true',
-  		padding: '2rem',
-  		screens: {
-  			'2xl': '1400px'
-  		}
-  	},
+	container: {
+        center: true,
+        padding: {
+          DEFAULT: "1rem",
+          sm: "2rem",
+          lg: "4rem",
+          xl: "5rem",
+          "2xl": "6rem",
+        },
+      },
   	extend: {
   		colors: {
   			neutralSilver: '#F5F7FA',
+			borda: '#0063ff33',
+			one: "#ffcf3a",
+			two: "#2563eb",
+			slid: '#0063ff1a',
   			neutralDGrey: '#4D4D4D',
   			brandPrimary: '#4CAF4F',
   			neutralGrey: '#717171',

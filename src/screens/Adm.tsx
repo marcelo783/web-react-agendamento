@@ -4,6 +4,9 @@ import { Input } from '@/components/ui/input';
 import CardAdm from '@/components/CardAdm'; // Importando o componente
 import HorizontalCalendar from '@/components/HorizontalCalendar';
 import Pagination from '@/components/ui/pagination';
+import Sidebar from '@/components/Sidebar';
+import MainLayout from '@/components/MainLayout';
+
 
 
 
@@ -14,7 +17,9 @@ const Adm: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [events, setEvents] = useState([]);
   const [pacientes, setPacientes] = useState({});
-  const [currentPage, setCurrentPage] = useState(1); // Estado para controlar a página atual
+  const [currentPage, setCurrentPage] = useState(1); 
+  
+  // Estado para controlar a página atual
 
   // Função para buscar os eventos da API com os filtros aplicados
   const fetchEvents = async (searchTerm = '', selectedDate = null) => {
@@ -94,9 +99,12 @@ const Adm: React.FC = () => {
       setCurrentPage(currentPage - 1);
     }
   };
+  
 
   return (
+    <MainLayout>
     <div className="flex flex-col p-4 space-y-4">
+      
       {/* Primeira Div: Input e Calendário */}
       <div className="flex flex-col lg:flex-row p-4 items-center justify-between space-y-4 lg:space-y-0 lg:space-x-4">
         <div className="w-full lg:w-1/4">
@@ -153,7 +161,11 @@ const Adm: React.FC = () => {
       />
       
     </div>
+    </MainLayout>
   );
+ 
 };
+
+
 
 export default Adm;

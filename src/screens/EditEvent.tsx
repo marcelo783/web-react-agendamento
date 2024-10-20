@@ -24,11 +24,7 @@ import { toast } from "@/hooks/use-toast";
 const EditEvent = () => {
   const { googleCalendarId, _id } = useParams();  // Captura o googleCalendarId da URL
   // Captura o googleCalendarId da URL
-  const { search } = useLocation(); // Captura a parte da query da URL
-  const query = new URLSearchParams(search);
-  const idType = query.get('type'); // 'google' ou 'custom'
-
-  const id = googleCalendarId || _id;
+ 
 
   const navigate = useNavigate();
   const [cookies] = useCookies(["accessToken", "authToken"]); // Acessa o accessToken dos cookies

@@ -1,20 +1,13 @@
-import { useState } from "react";
-import logo from "../assets/pactto-logo.svg";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { MdMenuOpen } from "react-icons/md";
 import { IoHome } from "react-icons/io5";
-import { FaProductHunt } from "react-icons/fa";
-import { FaUserCircle } from "react-icons/fa";
+import { FaProductHunt, FaUserCircle } from "react-icons/fa";
 import { IoIosAddCircle } from "react-icons/io";
 import { FaCalendarDays } from "react-icons/fa6";
+import logo from "../assets/pactto-logo.svg"; // Atualize o caminho conforme necessário
 
-type MenuItem = {
-  icons: JSX.Element;
-  label: string;
-  path: string;
-};
-
-const menuItems: MenuItem[] = [
+const menuItems = [
   {
     icons: <IoHome size={20} />,
     label: "adm",
@@ -42,60 +35,80 @@ const menuItems: MenuItem[] = [
   },
 ];
 
-export default function Sidebar() {
-  const [open, setOpen] = useState<boolean>(true);
+export default function Sidebar({ isOpen, onToggle }) {
+  const [isMobile, setIsMobile] = useState(false);
+  const location = useLocation(); // Usado para capturar a rota atual e destacar o item ativo
+
+  // Efeito para verificar se estamos no mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768); // Defina a largura do mobile como 768px ou qualquer valor desejado
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Adiciona overflow-hidden ao body quando o sidebar estiver aberto no mobile
+  useEffect(() => {
+    if (isMobile && isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [isMobile, isOpen]);
 
   return (
     <nav
-      className={`shadow-md h-screen p-2 flex flex-col duration-500  bg-blue-600  text-white sticky top-0 ${
-        open ? "w-56" : "w-16"
-      }`}
+      className={`shadow-md h-screen p-2 flex flex-col bg-blue-600 text-white fixed top-0 z-50 transition-all duration-500 ${
+        isOpen ? "w-56" : "w-16"
+      } ${isMobile && isOpen ? "absolute w-56" : "fixed"}`}
     >
+      {/* Cabeçalho com Logo e Botão de Menu */}
       <div className="border px-3 py-2 h-20 flex justify-between items-center">
         <img
           src={logo}
           alt="Logo"
-          className={`${open ? "w-10" : "w-0"} rounded-md`}
+          className={`transition-all duration-300 ${isOpen ? "w-10" : "w-0"}`}
         />
-        <div>
-          <MdMenuOpen
-            size={34}
-            className={`duration-500 cursor-pointer ${!open && "rotate-180"}`}
-            onClick={() => setOpen(!open)}
-          />
-        </div>
+        <MdMenuOpen
+          size={34}
+          className={`cursor-pointer transition-transform duration-500 ${
+            !isOpen && "rotate-180"
+          }`}
+          onClick={onToggle}
+        />
       </div>
-      <ul className="flex-1">
+
+      {/* Itens do Menu */}
+      <ul className="flex-1 mt-4">
         {menuItems.map((item, index) => (
           <Link to={item.path} key={index}>
-            <li className="px-3 py-2 my-2 hover:bg-blue-800 rounded-md duration-300 cursor-pointer flex gap-2 items-center relative group">
+            <li
+              className={`px-3 py-2 my-2 hover:bg-blue-800 rounded-md duration-300 cursor-pointer flex gap-2 items-center ${
+                location.pathname === item.path ? "bg-blue-900" : ""
+              }`}
+            >
               <div>{item.icons}</div>
-              <p
-                className={`${
-                  !open && "w-0 translate-x-24"
-                } duration-500 overflow-hidden`}
+              <span
+                className={`transition-all duration-300 whitespace-nowrap ${
+                  !isOpen ? "opacity-0 w-0" : "opacity-100 w-auto"
+                }`}
               >
                 {item.label}
-              </p>
-              <p
-                className={`${
-                  open && "hidden"
-                } absolute left-32 shadow-md rounded-md w-0 p-0 text-black bg-white duration-300 overflow-hidden group-hover:w-fit group-hover:p-2 group-hover:left-16`}
-              >
-                {item.label}
-              </p>
+              </span>
             </li>
           </Link>
         ))}
       </ul>
+
+      {/* Seção de Usuário */}
       <div className="flex items-center gap-2 px-3 py-2">
-        <div>
-          <FaUserCircle size={20} />
-        </div>
+        <FaUserCircle size={20} />
         <div
-          className={`leading-5 ${
-            !open && "w-0 translate-x-24"
-          } duration-500 overflow-hidden`}
+          className={`leading-5 transition-all duration-300 ${
+            !isOpen ? "opacity-0 w-0" : "opacity-100 w-auto"
+          }`}
         >
           <p>mcl</p>
           <span className="text-xs">mcl@gmail.com</span>

@@ -20,6 +20,7 @@ import axios from "axios"; // Para fazer a requisição
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "@/hooks/use-toast";
+import MainLayout from "@/components/MainLayout";
 
 const CreateEvent = () => {
   const [cookies] = useCookies(["authToken"]); // Obtém o token JWT do cookie
@@ -208,6 +209,7 @@ const CreateEvent = () => {
   };
 
   return (
+    <MainLayout>
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 sm:p-8">
       <Card className="w-full max-w-2xl">
         <CardHeader>
@@ -441,6 +443,7 @@ const CreateEvent = () => {
         </CardContent>
       </Card>
     </div>
+    </MainLayout>
   );
 };
 
