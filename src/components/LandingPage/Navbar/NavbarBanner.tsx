@@ -28,7 +28,7 @@ const NavbarBanner = () => {
     animate={{opacity:1}}
     transition={{duration: 0.5, delay: 0.7}}
     
-    className={`${active ? "py-1 transition-all duration-300" : "py-1 top-[67px]"} fixed w-full top-[56px] left-0 z-20 bg-one text-sm text-center font-semibold p-1 hidden lg:block`}>
+    className={`${active ? "py-1 transition-all duration-300" : "py-1 top-[69px]"} fixed w-full top-[56px] left-0 z-20 bg-one text-sm text-center font-semibold p-1 hidden lg:block`}>
         você está em busca de fazer agendamentos de consulta com piscólogos?
         <a href='#' className='text-two ml-2'>fale conosco!</a>
         <div className='absolute top-1/2 right-10 cursor-pointer -translate-y-1/2'

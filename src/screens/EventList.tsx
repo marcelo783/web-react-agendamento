@@ -11,10 +11,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton"
+
 import { Input } from "@/components/ui/input";
 import { ptBR } from 'date-fns/locale';
 import { useCookies } from 'react-cookie';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import ErroImg from "../assets/person-calendar.png";
 
 
 
@@ -140,12 +143,70 @@ const EventList = () => {
   };
 
   if (loading) {
-    return <p>Carregando eventos...</p>;
+    return (
+      <div className="container mx-auto py-10">
+        {/* Texto no topo */}
+        <p className="text-lg font-semibold text-center mb-6">
+          Buscando datas disponíveis...
+        </p>
+  
+        {/* Grid dos cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Card 1 */}
+          <div className="p-6 border rounded-lg shadow-md">
+            <Skeleton className="h-40 w-full mb-4" />
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <Skeleton className="h-6 w-1/2" />
+          </div>
+  
+          {/* Card 2 */}
+          <div className="p-6 border rounded-lg shadow-md">
+            <Skeleton className="h-40 w-full mb-4" />
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <Skeleton className="h-6 w-1/2" />
+          </div>
+  
+          {/* Card 3 */}
+          <div className="p-6 border rounded-lg shadow-md">
+            <Skeleton className="h-40 w-full mb-4" />
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <Skeleton className="h-6 w-1/2" />
+          </div>
+        </div>
+      </div>
+    );
   }
+  
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 px-4">
+        {/* Imagem de erro */}
+        <img
+          src={ErroImg} // Substitua pela URL da imagem de erro
+          alt="Error illustration"
+          className="w-64 h-64 mb-8" // Responsivo conforme o tamanho da tela
+        />
+  
+        {/* Mensagem de erro */}
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-3">
+          OOPS!
+        </h1>
+        <p className="text-base font-semibold sm:text-lg md:text-xl text-gray-600 mb-8 text-center">
+          Erro ao buscar agendamentos, tente novamente mais tarde!
+        </p>
+  
+        {/* Botão de voltar */}
+        <button
+          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-all duration-300"
+          onClick={() => window.history.back()} // Função para voltar
+        >
+          Voltar
+        </button>
+      </div>
+    );
   }
+  
 
   return (
     <div className="container mx-auto p-4">

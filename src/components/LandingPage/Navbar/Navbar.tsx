@@ -4,12 +4,15 @@ import { MdComputer, MdMenu } from "react-icons/md";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import ResponsiveMenu from "./ResponsiveMenu.js";
+import { FcGoogle } from "react-icons/fc";
 
 const Navbar = () => {
-  const navigate = useNavigate();
-  const handleLoginClick = () => {
-    navigate("/login");
-  };
+  const handleGoogleLogin  =  async ()  => {
+    //await loginGoogle().then(res => console.log(res.data))
+  
+      // Redireciona o usuário para a URL de autenticação do Google
+      window.location.href = 'http://localhost:5000/auth/google';
+    };
 
   const [isOpen, setIsOpen] = React.useState(false);
   const [active, setActive] = useState(null);
@@ -17,33 +20,43 @@ const Navbar = () => {
   const scrollToSection = (id) => {
     const element = document.querySelector(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" }); // Rolagem suave
+      element.scrollIntoView({ behavior: "smooth" });
     }
-  }; 
+  };
 
   useEffect(() => {
     const scrollActive = () => {
-      setActive(window.scrollY > 20 );
-    }
+      setActive(window.scrollY > 20);
+    };
     window.addEventListener("scroll", scrollActive);
-    return () => window.removeEventListener("scroll", scrollActive)
+    return () => window.removeEventListener("scroll", scrollActive);
   }, [active]);
 
   return (
     <>
-      <motion.div className={`${active ? "shadow-lg bg-white" : ""} fixed w-full  left-0 z-20`}
-      initial={{opacity:0}}
-      animate={{opacity:1}}
-      transition={{duration: 0.5, delay: 0.5}}
+      <motion.div
+        className={`${active ? "shadow-lg bg-white" : ""} fixed w-full left-0 z-20`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
       >
-        <div className={`${active ? "py-2 transition-all duration-300" : "py-6 " } container flex justify-between items-center max-auto`}>
-          {/*logo section */}
-          <div className="text-2xl flex items-center gap-2 font-bold">
-            <MdComputer className="text-3xl text-two" />
-            <p>E-Tutor</p>
+        <div
+          className={`${
+            active ? "py-2 transition-all duration-300" : "py-4"
+          } container flex items-center justify-between max-auto`}
+        >
+          {/* mobile hamburguer menu */}
+          <div className="lg:hidden" onClick={() => setIsOpen(!isOpen)}>
+            <MdMenu className="text-4xl text-black" />
           </div>
-          {/*menu section */}
 
+          {/* logo section */}
+          <div className="text-2xl flex items-center gap-2 font-bold mx-auto lg:mx-0">
+            <MdComputer className="text-3xl text-two" />
+            <p>Agenda Ki</p>
+          </div>
+
+          {/* desktop menu section */}
           <div className="hidden lg:block">
             <ul className="flex items-center gap-6">
               {NavbarMenu.map((item) => {
@@ -52,8 +65,8 @@ const Navbar = () => {
                     <a
                       href={item.link}
                       onClick={(e) => {
-                        e.preventDefault(); // Previne o comportamento padrão do link
-                        scrollToSection(item.link); // Chama a função de rolagem suave
+                        e.preventDefault(); 
+                        scrollToSection(item.link);
                       }}
                       className="inline-block text-gray-600 text-sm xl:text-base py-1 px-2 xl:px-3 hover:text-two transition-all duration-300 font-semibold"
                     >
@@ -64,27 +77,22 @@ const Navbar = () => {
               })}
             </ul>
           </div>
-          {/*cta button section */}
 
-          <div className="hidden lg:block space-x-6">
+          {/* login button section */}
+          <div className="flex-shrink-0">
             <button
-              className="font-semibold text-white bg-two rounded-full px-6 py-2"
-              onClick={handleLoginClick}
+              className="flex items-center gap-2 font-semibold text-black border border-two rounded-full px-4 py-1 md:px-5 md:py-2 lg:px-6 lg:py-2 transition-all"
+              onClick={handleGoogleLogin}
             >
-              Login com Google
+              <FcGoogle />
+              <span className="text-sm md:text-base lg:text-lg">Login</span>
             </button>
           </div>
-
-          {/*mobile hamburguer menu */}
-          <div className="lg:hidden" onClick={() => setIsOpen(!isOpen)}>
-            <MdMenu className="text-4xl"/>
-          </div>
-
         </div>
       </motion.div>
 
-       {/*mobile sidebar section*/}
-      <ResponsiveMenu isOpen={isOpen}/>
+      {/* mobile sidebar section */}
+      <ResponsiveMenu isOpen={isOpen} />
     </>
   );
 };
