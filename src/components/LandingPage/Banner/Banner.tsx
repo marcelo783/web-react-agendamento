@@ -1,9 +1,18 @@
-import { subtle } from "crypto";
-import React from "react";
+
 import { motion } from "framer-motion";
 import SlideUp from "../../../utility/animation"
+import { FC } from "react";
 
-const Banner = ({ image, title, Subtitle, link, tag, reverse }) => {
+type BannerProps = {
+  image: string;
+  title: string;
+  Subtitle: string;
+  link?: string;
+  tag?: string;
+  reverse?: boolean;
+};
+
+const Banner: FC<BannerProps>  = ({ image, title, Subtitle, tag, reverse }) => {
   return (
     <div id="sobre" className=" bg-[#f9f9f1] pb-14">
       <div className="container">

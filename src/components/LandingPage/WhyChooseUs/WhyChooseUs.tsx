@@ -1,9 +1,7 @@
-import React from "react";
+
 import { FaGlobe, FaClock, FaMoneyBillWave, FaLock } from "react-icons/fa";
-import { delay, motion } from "framer-motion";
-import { title } from "process";
-import { Icon, LucideMilk, Sliders } from "lucide-react";
-import { link } from "fs";
+import {  motion } from "framer-motion";
+
 import { SlideLeft } from "@/utility/animation";
 
 const WhyChooseData = [

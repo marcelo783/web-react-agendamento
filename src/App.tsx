@@ -7,9 +7,7 @@ import Adm from './screens/Adm';
 import PrivateRoute from './routes/PrivateRoute'; // Importe o componente de rota privada
 import Login from './screens/Login';
 import CreatEvent from './screens/CreateEvent';
-import Sidebar from './components/Sidebar';
 import EventList from './screens/EventList';
-import HorizontalCalendar from './components/HorizontalCalendar';
 import EditEvent from './screens/EditEvent';
 
 
@@ -40,7 +38,6 @@ const App: React.FC = () => {
         <Route path="/edit-event-id/:_id" element={<PrivateRoute><EditEvent /></PrivateRoute>} />
         
 
-        <Route path="DataTest" element={<HorizontalCalendar />}/>
       </Routes>
 
       </div>

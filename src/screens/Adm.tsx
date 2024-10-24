@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import CardAdm from '@/components/CardAdm'; // Importando o componente
 import HorizontalCalendar from '@/components/HorizontalCalendar';
 import Pagination from '@/components/ui/pagination';
-import Sidebar from '@/components/Sidebar';
+
 import MainLayout from '@/components/MainLayout';
 
 
@@ -16,8 +16,20 @@ const Adm: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
   const [events, setEvents] = useState([]);
-  const [pacientes, setPacientes] = useState({});
+  
   const [currentPage, setCurrentPage] = useState(1); 
+
+  const [pacientes, setPacientes] = useState<PacientesState>({});  // Inicializando como um objeto vazio
+
+  // type EventType = {
+  //   paciente?: string;  // Ou use o tipo correto do campo 'paciente'
+  //   // Outros campos do evento
+  // };
+  
+  // Tipo para o estado 'pacientes'
+  type PacientesState = {
+    [key: string]: string;  // Um objeto onde a chave é o ID do paciente e o valor é o nome do paciente
+  };
   
   // Estado para controlar a página atual
 
@@ -42,7 +54,7 @@ const Adm: React.FC = () => {
   };
   
   // Também aplique essa configuração em outras chamadas axios
-  const fetchPacienteById = async (id) => {
+  const fetchPacienteById = async (id:any) => {
     try {
       const response = await axios.get(`http://localhost:5000/pacientes/${id}`, {
         withCredentials: true,
@@ -66,13 +78,13 @@ const Adm: React.FC = () => {
     fetchEvents(searchTerm, selectedDate);
   }, [searchTerm, selectedDate]);
 
-  const handleDateSelect = (date) => {
+  const handleDateSelect = (date:any) => {
     setSelectedDate(date.toISOString().split('T')[0]);
   };
 
   // Busca o nome do paciente para cada evento ao carregar a página
   useEffect(() => {
-    events.forEach(async (event) => {
+    events.forEach(async (event:any) => {
       console.log('ID do Paciente:', event.paciente);  // Verifique se o ID está correto
       if (event.paciente && !pacientes[event.paciente]) {
         const nomePaciente = await fetchPacienteById(event.paciente);
@@ -88,17 +100,17 @@ const Adm: React.FC = () => {
   const selectedEvents = events.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   // Funções para navegação da paginação
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  // const goToNextPage = () => {
+  //   if (currentPage < totalPages) {
+  //     setCurrentPage(currentPage + 1);
+  //   }
+  // };
 
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  // const goToPreviousPage = () => {
+  //   if (currentPage > 1) {
+  //     setCurrentPage(currentPage - 1);
+  //   }
+  // };
   
 
   return (
@@ -124,7 +136,7 @@ const Adm: React.FC = () => {
       {/* Segunda Div: Cards, agora posicionados abaixo do input e do calendário */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
   {selectedEvents.length > 0 ? (
-    selectedEvents.map((event, index) => {
+    selectedEvents.map((event:any, index) => {
       // Verifica o conteúdo de cada evento aqui
 
       return (

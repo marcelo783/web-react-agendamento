@@ -111,7 +111,7 @@ const CardAdm: React.FC<CardAdmProps> = ({
       toast({
         title: "Agendamento deletado",
         description: "O agendamento foi deletado com sucesso.",
-        status: "success",
+        //status: "success",
       });
   
       console.log("Agendamento deletado com sucesso");

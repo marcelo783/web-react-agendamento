@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ptBR } from "date-fns/locale";
-import accessToken from "@/cookies/appAccessToken";
+
 import { format } from "date-fns";
 import { FaTrashAlt } from "react-icons/fa";
-import { useLocation } from 'react-router-dom';
+
 import {
   Popover,
   PopoverContent,
@@ -50,7 +50,7 @@ const EditEvent = () => {
     });
   };
   // Função para adicionar um novo horário
-  const handleAddHorario = (dispIndex) => {
+  const handleAddHorario = (dispIndex:any) => {
     const updatedDisponibilidade = [...formData.disponibilidade];
     updatedDisponibilidade[dispIndex].horarios.push({
       inicio: "",
@@ -61,14 +61,14 @@ const EditEvent = () => {
   };
 
   // Função para remover um horário
-  const handleRemoveHorario = (dispIndex, horarioIndex) => {
+  const handleRemoveHorario = (dispIndex:any, horarioIndex:any) => {
     const updatedDisponibilidade = [...formData.disponibilidade];
     updatedDisponibilidade[dispIndex].horarios.splice(horarioIndex, 1);
     setFormData({ ...formData, disponibilidade: updatedDisponibilidade });
   };
 
 
-  const handleHorarioChange = (e, dispIndex, horarioIndex) => {
+  const handleHorarioChange = (e:any, dispIndex:any, horarioIndex:any) => {
     const { name, value } = e.target;
     const updatedHorarios = formData.disponibilidade[dispIndex].horarios.map(
       (horario, i) => {
@@ -98,7 +98,7 @@ const EditEvent = () => {
   
 
   // Função para calcular a duração automaticamente
-  const calculateDuration = (inicio, fim) => {
+  const calculateDuration = (inicio:any, fim:any) => {
     const [startHour, startMinute] = inicio.split(":");
     const [endHour, endMinute] = fim.split(":");
 
@@ -114,7 +114,7 @@ const EditEvent = () => {
 
 
   // Função para remover uma data
-  const handleRemoveDisponibilidade = (dispIndex) => {
+  const handleRemoveDisponibilidade = (dispIndex:any) => {
     const updatedDisponibilidade = [...formData.disponibilidade];
     updatedDisponibilidade.splice(dispIndex, 1);
     setFormData({ ...formData, disponibilidade: updatedDisponibilidade });
@@ -187,7 +187,7 @@ const EditEvent = () => {
 
   
   // Função para salvar os dados atualizados
-  const handleSave = async (e) => {
+  const handleSave = async (e:any) => {
     e.preventDefault();
   
     const token = cookies.accessToken;

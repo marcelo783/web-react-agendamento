@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavbarMenu } from "../../../mockData/data.js";
 import { MdComputer, MdMenu } from "react-icons/md";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+
 import ResponsiveMenu from "./ResponsiveMenu.js";
 import { FcGoogle } from "react-icons/fc";
 
@@ -15,14 +15,19 @@ const Navbar = () => {
     };
 
   const [isOpen, setIsOpen] = React.useState(false);
-  const [active, setActive] = useState(null);
+  const [active, setActive] = useState<boolean>(false);
 
-  const scrollToSection = (id) => {
+  const scrollToSection = (id:any) => {
     const element = document.querySelector(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+    // Função para fechar o menu
+    const handleCloseMenu = () => {
+      setIsOpen(false);
+    };
 
   useEffect(() => {
     const scrollActive = () => {
@@ -92,7 +97,7 @@ const Navbar = () => {
       </motion.div>
 
       {/* mobile sidebar section */}
-      <ResponsiveMenu isOpen={isOpen} />
+      <ResponsiveMenu isOpen={isOpen} onClose={handleCloseMenu}/>
     </>
   );
 };

@@ -1,17 +1,20 @@
-import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const ResponsiveMenu = ({ isOpen }) => {
+type ResponsiveMenuProps = {
+  isOpen: boolean;
+  onClose: () => void; // Define que onClose é uma função sem parâmetros que retorna void
+};
 
-   // Função para rolar suavemente até a seção
-   const scrollToSection = (id) => {
+const ResponsiveMenu: React.FC<ResponsiveMenuProps> = ({ isOpen, onClose }) => {
+  // Função para rolar suavemente até a seção
+  const scrollToSection = (id: string) => {
     const element = document.querySelector(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" }); // Rolagem suave
       onClose(); // Fecha o menu após clicar no item
     }
   };
-
+  
   return (
     <AnimatePresence mode="wait">
       {isOpen && (

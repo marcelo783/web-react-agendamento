@@ -1,7 +1,7 @@
-import React from 'react'
-import { delay, motion } from "framer-motion";
+
+import {  motion } from "framer-motion";
 import { FaBrain, FaSmile, FaComments, FaHeart, FaChild, FaUserFriends, FaMedkit, FaHandsHelping } from "react-icons/fa";
-import { id } from 'date-fns/locale';
+
 
 
 const SubjecList = [

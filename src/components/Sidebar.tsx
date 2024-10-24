@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FC } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MdMenuOpen } from "react-icons/md";
 import { IoHome } from "react-icons/io5";
@@ -6,6 +6,7 @@ import { FaProductHunt, FaUserCircle } from "react-icons/fa";
 import { IoIosAddCircle } from "react-icons/io";
 import { FaCalendarDays } from "react-icons/fa6";
 import logo from "../assets/pactto-logo.svg"; // Atualize o caminho conforme necessário
+
 
 const menuItems = [
   {
@@ -35,7 +36,12 @@ const menuItems = [
   },
 ];
 
-export default function Sidebar({ isOpen, onToggle }) {
+type SidebarProps = {
+  isOpen: boolean;      // Define que 'isOpen' é um boolean
+  onToggle: () => void; // Define que 'onToggle' é uma função sem retorno
+};
+
+const Sidebar: FC<SidebarProps> = ({ isOpen, onToggle }) =>  {
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation(); // Usado para capturar a rota atual e destacar o item ativo
 
@@ -117,3 +123,4 @@ export default function Sidebar({ isOpen, onToggle }) {
     </nav>
   );
 }
+export default Sidebar;

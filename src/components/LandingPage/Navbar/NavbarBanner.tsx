@@ -4,16 +4,18 @@ import { motion } from "framer-motion";
 const NavbarBanner = () => {
     const [isOpen, setIsOpen] = React.useState(true);
 
-    const [active, setActive] = useState(null);
 
-  const scrollToSection = (id) => {
-    const element = document.querySelector(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" }); // Rolagem suave
-    }
-  }; 
+    const [active, setActive] = useState<boolean>(false);
+
+  // const scrollToSection = (id:any) => {
+  //   const element = document.querySelector(id);
+  //   if (element) {
+  //     element.scrollIntoView({ behavior: "smooth" }); // Rolagem suave
+  //   }
+  // }; 
 
   useEffect(() => {
+    
     const scrollActive = () => {
       setActive(window.scrollY > 20 );
     }

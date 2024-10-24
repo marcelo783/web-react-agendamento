@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
@@ -22,19 +22,20 @@ import ErroImg from "../assets/person-calendar.png";
 
 
 const EventList = () => {
-  const [cookies, setCookie] = useCookies(['accessToken']);
+  const [cookies] = useCookies(['accessToken']);
   const [events, setEvents] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [availableTimes, setAvailableTimes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [ setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
     telefone: '',
     agendamentoId: '',
+   
   });
 
   useEffect(() => {
@@ -57,7 +58,7 @@ const EventList = () => {
     return [].concat(...availableDays);
   };
 
-  const handleDateSelect = (date) => {
+  const handleDateSelect = (date:any) => {
     setSelectedDate(date);
 
     // Encontrar o evento que possui a disponibilidade correspondente à data selecionada
@@ -81,7 +82,7 @@ const EventList = () => {
     }
   };
 
-  const handleOpenDialog = (agendamentoId) => {
+  const handleOpenDialog = (agendamentoId:any) => {
     if (!selectedEvent) {
       console.error('Nenhum evento selecionado.');
       return;
@@ -101,12 +102,12 @@ const EventList = () => {
     });
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e:any) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = async (e:any) => {
     e.preventDefault();
 
     if (!formData.nome || !formData.email || !formData.telefone) {

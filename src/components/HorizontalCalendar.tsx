@@ -10,7 +10,11 @@ import {
 import { ptBR } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const HorizontalCalendar = ({ onSelectDate }) => {
+type HorizontalCalendarProps = {
+  onSelectDate: (date: Date) => void; // Define o tipo da função onSelectDate
+};
+
+const HorizontalCalendar = ({ onSelectDate }: HorizontalCalendarProps) => {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState(null); // Data selecionada pelo usuário
   const [daysToShow, setDaysToShow] = useState(7); // Número de dias para exibir
@@ -23,14 +27,14 @@ const HorizontalCalendar = ({ onSelectDate }) => {
     setCurrentDate(addWeeks(currentDate, 1));
   };
 
-  const handleDayClick = (date) => {
+  const handleDayClick = (date:any) => {
     setSelectedDate(date);
     if (onSelectDate) {
       onSelectDate(date); // Passa a data selecionada para o componente pai
     }
   };
 
-  const handleMonthChange = (event) => {
+  const handleMonthChange = (event:any) => {
     const newMonth = event.target.value;
     const newDate = new Date(currentDate);
     newDate.setMonth(newMonth);
@@ -42,7 +46,7 @@ const HorizontalCalendar = ({ onSelectDate }) => {
     }
   };
 
-  const handleYearChange = (event) => {
+  const handleYearChange = (event:any) => {
     const newYear = event.target.value;
     const newDate = new Date(currentDate);
     newDate.setFullYear(newYear);

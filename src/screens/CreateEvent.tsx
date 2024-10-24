@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -44,7 +44,7 @@ const CreateEvent = () => {
     ],
   });
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e:any) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
@@ -62,7 +62,7 @@ const CreateEvent = () => {
     });
   };
 
-  const handleHorarioChange = (e, dispIndex, horarioIndex) => {
+  const handleHorarioChange = (e:any, dispIndex:any, horarioIndex:any) => {
     const { name, value } = e.target;
     const updatedHorarios = formData.disponibilidade[dispIndex].horarios.map(
       (horario, i) => {
@@ -90,7 +90,7 @@ const CreateEvent = () => {
     }));
   };
 
-  const handleRemoveHorario = (dispIndex, horarioIndex) => {
+  const handleRemoveHorario = (dispIndex:any, horarioIndex:any) => {
     const updatedHorarios = formData.disponibilidade[dispIndex].horarios.filter(
       (_, i) => i !== horarioIndex
     );
@@ -105,7 +105,7 @@ const CreateEvent = () => {
     }));
   };
 
-  const handleRemoveDisponibilidade = (dispIndex) => {
+  const handleRemoveDisponibilidade = (dispIndex:any) => {
     const updatedDisponibilidade = formData.disponibilidade.filter(
       (_, i) => i !== dispIndex
     );
@@ -116,18 +116,19 @@ const CreateEvent = () => {
     }));
   };
 
-  const calculateDuration = (inicio, fim) => {
+  const calculateDuration = (inicio: string, fim: string) => {
     const [startHour, startMinute] = inicio.split(":").map(Number);
     const [endHour, endMinute] = fim.split(":").map(Number);
-
-    const startTime = new Date(0, 0, 0, startHour, startMinute);
-    const endTime = new Date(0, 0, 0, endHour, endMinute);
-
+  
+    const startTime = new Date(0, 0, 0, startHour, startMinute).getTime();
+    const endTime = new Date(0, 0, 0, endHour, endMinute).getTime();
+  
     const duration = (endTime - startTime) / 60000; // Duração em minutos
     return duration > 0 ? duration : 1; // Retorna 1 como valor mínimo
   };
+  
 
-  const handleAddHorario = (dispIndex) => {
+  const handleAddHorario = (dispIndex:any) => {
     const updatedDisponibilidade = formData.disponibilidade.map((disp, i) =>
       i === dispIndex
         ? {
@@ -156,7 +157,7 @@ const CreateEvent = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault();
 
     // Extrai o payload do token JWT
@@ -198,7 +199,7 @@ const CreateEvent = () => {
       toast({
         title: "Agendamento criado com sucesso",
         description: "O agendamento foi criado com sucesso.",
-        status: "success",
+        //status: "success",
       });
 
       console.log("Agendamento criado com sucesso:", response.data);
@@ -250,7 +251,8 @@ const CreateEvent = () => {
                 name="formatoConsulta"
                 value="online"
                 checked={formData.formatoConsulta === "online"}
-                onCheckedChange={(checked) => handleChange(checked, "online")}
+                onCheckedChange={(checked) => handleChange(!!checked, "online")}
+
               />
               <Label htmlFor="online">Online</Label>
 
@@ -260,7 +262,7 @@ const CreateEvent = () => {
                 value="presencial"
                 checked={formData.formatoConsulta === "presencial"}
                 onCheckedChange={(checked) =>
-                  handleChange(checked, "presencial")
+                  handleChange(!!checked, "presencial")
                 }
               />
               <Label htmlFor="presencial">Presencial</Label>
@@ -285,7 +287,7 @@ const CreateEvent = () => {
                 id="repete"
                 name="repete"
                 checked={formData.repete}
-                onCheckedChange={(checked) => handleChange(checked, "repete")}
+                onCheckedChange={(checked) => handleChange(!!checked, "repete")}
               />
               <Label htmlFor="repete" className="ml-2">
                 Repetir agendamento?

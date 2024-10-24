@@ -1,15 +1,14 @@
-import { authService } from '@/api/auth';
-import Navbar from '@/components/LandingPage/Navbar/Navbar';
+
 import accessToken from '@/cookies/appAccessToken';
 import authToken from '@/cookies/appCookies';
-import React, { useEffect } from 'react';
+import  { useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 //import { Navbar } from "../components/LandingPage/Navbar/Navbar";
 
 
 const Login = () => {
-  const [cookies, setCookie] = useCookies([authToken, accessToken]);
-  const {loginGoogle} = authService() 
+  const [cookies, ] = useCookies([authToken, accessToken]);
+  //const {loginGoogle} = authService() 
 
   const handleGoogleLogin  =  async ()  => {
   //await loginGoogle().then(res => console.log(res.data))

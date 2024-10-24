@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { HiLocationMarker } from "react-icons/hi";
-import { MdComputer } from "react-icons/md";
+
 import { motion } from "framer-motion";
 import FooterImg from "../../../assets/footer.jpg";
 import personImg from "../../../assets/person-calendar.png";
@@ -15,9 +15,9 @@ const FooterBg = {
 
 const Footer = () => {
 
-  const [active, setActive] = useState(null);
+  
 
-  const scrollToSection = (id) => {
+  const scrollToSection = (id:any) => {
     const element = document.querySelector(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });

@@ -1,15 +1,13 @@
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 
 
 import { useCookies } from 'react-cookie';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Label } from "@/components/ui/label";
 
@@ -18,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import MainLayout from "@/components/MainLayout";
 
 const Register = () => {
-  const [cookies, setCookie] = useCookies(['authToken']);
+  const [cookies] = useCookies(['authToken']);
   const navigate = useNavigate();
 
   // Estado para armazenar os dados do formulário
@@ -53,7 +51,7 @@ const Register = () => {
   }, [cookies, navigate]);
 
 
-  const handleChange = (e) => {
+  const handleChange = (e:any) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -61,16 +59,16 @@ const Register = () => {
     });
   };
 
-  const handleCheckboxChange = (checked, name) => {
-  setFormData((prevState) => ({
-    ...prevState,
-    [name]: checked,
-  }));
-};
+//   const handleCheckboxChange = (checked:any, name:any) => {
+//   setFormData((prevState) => ({
+//     ...prevState,
+//     [name]: checked,
+//   }));
+// };
 
 
   // Função de submissão do formulário
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault();
 
     try {
