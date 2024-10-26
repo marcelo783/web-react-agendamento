@@ -32,7 +32,7 @@ const CreateEvent = () => {
     repete: false,
     disponibilidade: [
       {
-        dia: null,
+        dia: new Date(),
         horarios: [
           {
             inicio: "",
@@ -150,7 +150,7 @@ const CreateEvent = () => {
       disponibilidade: [
         ...prevState.disponibilidade,
         {
-          dia: null,
+          dia: new Date(),
           horarios: [{ inicio: "", fim: "", duracao: 1 }],
         },
       ],
@@ -324,7 +324,7 @@ const CreateEvent = () => {
                           setFormData((prevState) => {
                             const updatedDisponibilidade =
                               prevState.disponibilidade.map((d, i) =>
-                                i === dispIndex ? { ...d, dia: date } : d
+                                i === dispIndex ? { ...d, dia: date?? new Date() } : d
                               );
                             return {
                               ...prevState,

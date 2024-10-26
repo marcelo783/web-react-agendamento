@@ -21,34 +21,62 @@ import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "@/hooks/use-toast";
 
+
+type Disponibilidade = {
+  dia: Date | string;
+  horarios: {
+    inicio: string;
+    fim: string;
+    duracao: number;
+  }[];
+};
+
+type FormDataType = {
+  _id?: string;
+  agendamentoId?: string;
+  titulo: string;
+  descricao: string;
+  pacienteEmail: string; 
+  formatoConsulta: string;
+  valor: string;
+  repete: boolean;
+  disponibilidade: Disponibilidade[];
+};
+
 const EditEvent = () => {
   const { googleCalendarId, _id } = useParams();  // Captura o googleCalendarId da URL
-  // Captura o googleCalendarId da URL
- 
-
+  // Captura o googleCalendarId da UR
   const navigate = useNavigate();
   const [cookies] = useCookies(["accessToken", "authToken"]); // Acessa o accessToken dos cookies
-
-  const [formData, setFormData] = useState({
-    _id: "",
-    agendamentoId: "", // Armazena o agendamentoId do backend
+  const [formData, setFormData] = useState<FormDataType>({
     titulo: "",
     descricao: "",
-    pacienteEmail: "",
-    formatoConsulta: "online",
+    pacienteEmail: "", 
+    formatoConsulta: "",
     valor: "",
+    repete: false,
     disponibilidade: [
-      { dia: null, horarios: [{ inicio: "", fim: "", duracao: 0 }] },
+      {
+        dia: new Date(), // ou uma string no formato YYYY-MM-DD
+        horarios: [
+          {
+            inicio: "",
+            fim: "",
+            duracao: 1,
+          },
+        ],
+      },
     ],
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value, // atualiza o valor do campo com o nome correspondente
+      [name]: value,
     });
   };
+  
   // Função para adicionar um novo horário
   const handleAddHorario = (dispIndex:any) => {
     const updatedDisponibilidade = [...formData.disponibilidade];
@@ -98,18 +126,15 @@ const EditEvent = () => {
   
 
   // Função para calcular a duração automaticamente
-  const calculateDuration = (inicio:any, fim:any) => {
-    const [startHour, startMinute] = inicio.split(":");
-    const [endHour, endMinute] = fim.split(":");
-
-    const startDate = new Date();
-    const endDate = new Date();
-
-    startDate.setHours(startHour, startMinute);
-    endDate.setHours(endHour, endMinute);
-
-    const duration = (endDate - startDate) / (1000 * 60); // Calcula a diferença em minutos
-    return duration > 0 ? duration : 0; // Retorna a duração ou 0 se o valor for negativo
+  const calculateDuration = (inicio: string, fim: string) => {
+    const [startHour, startMinute] = inicio.split(":").map(Number);
+    const [endHour, endMinute] = fim.split(":").map(Number);
+  
+    const startTime = new Date(0, 0, 0, startHour, startMinute).getTime();
+    const endTime = new Date(0, 0, 0, endHour, endMinute).getTime();
+  
+    const duration = (endTime - startTime) / 60000; // Duração em minutos
+    return duration > 0 ? duration : 1; // Retorna 1 como valor mínimo
   };
 
 
@@ -127,12 +152,13 @@ const EditEvent = () => {
       disponibilidade: [
         ...prevState.disponibilidade,
         {
-          dia: null,
+          dia: new Date(),  // Inicializa com a data atual
           horarios: [{ inicio: "", fim: "", duracao: 1 }],
         },
       ],
     }));
   };
+  
 
 
   // Função para buscar os dados do evento (incluindo agendamentoId) ao carregar a página
@@ -164,14 +190,18 @@ const EditEvent = () => {
   
         // Atualizar o estado do formulário com os dados obtidos
         setFormData({
-          _id: response.data._id, 
-          titulo: response.data.titulo,
-          descricao: response.data.descricao,
+          _id: response.data._id || "",
+          agendamentoId: formData.agendamentoId || "",
+          titulo: response.data.titulo || "",
+          descricao: response.data.descricao || "",
           pacienteEmail: response.data.pacienteEmail || "",
-          formatoConsulta: response.data.formatoConsulta,
-          valor: response.data.valor,
-          disponibilidade: response.data.disponibilidade,
+          formatoConsulta: response.data.formatoConsulta || "",
+          valor: response.data.valor ? String(response.data.valor) : "",
+          disponibilidade: response.data.disponibilidade || [],
+          repete: response.data.repete || false,  // Adicione esta linha para incluir `repete` com valor padrão
         });
+        
+        
       } catch (error) {
         console.error("Erro ao buscar o agendamento", error);
       }
@@ -250,7 +280,7 @@ const EditEvent = () => {
       toast({
         title: "Agendamento editado com sucesso",
         description: "O agendamento foi editado com sucesso.",
-        status: "success",
+       // status: "success",
       });
   
       navigate("/adm");
@@ -368,15 +398,16 @@ const EditEvent = () => {
                         mode="single"
                         selected={new Date(disp.dia)}
                         onSelect={(date) => {
-                          const updatedDisponibilidade = [
-                            ...formData.disponibilidade,
-                          ];
-                          updatedDisponibilidade[index].dia = date;
-                          setFormData({
-                            ...formData,
-                            disponibilidade: updatedDisponibilidade,
-                          });
+                          if (date) {  // Verifica se `date` não é `undefined`
+                            const updatedDisponibilidade = [...formData.disponibilidade];
+                            updatedDisponibilidade[index].dia = date;
+                            setFormData({
+                              ...formData,
+                              disponibilidade: updatedDisponibilidade,
+                            });
+                          }
                         }}
+                        
                         initialFocus
                         locale={ptBR}
                       />

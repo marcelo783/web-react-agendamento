@@ -12,7 +12,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton"
-
 import { Input } from "@/components/ui/input";
 import { ptBR } from 'date-fns/locale';
 import { useCookies } from 'react-cookie';
@@ -20,16 +19,36 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import ErroImg from "../assets/person-calendar.png";
 
 
+type Disponibilidade = {
+  dia: string; // ou Date, dependendo do seu modelo de dados
+  horarios: {
+    inicio: string;
+    fim: string;
+    duracao: number;
+  }[];
+};
+
+
+type Event = {
+  _id: string;
+  titulo: string;
+  descricao: string;
+  formatoConsulta: string;
+  status: string;
+  valor: number;
+  disponibilidade: Disponibilidade[];
+};;
+
 
 const EventList = () => {
-  const [cookies] = useCookies(['accessToken']);
-  const [events, setEvents] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [availableTimes, setAvailableTimes] = useState([]);
+ const [cookies] = useCookies(['accessToken']);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [availableTimes, setAvailableTimes] = useState<{ inicio: string; fim: string; duracao: number; }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [ setIsDialogOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [, setIsDialogOpen] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -53,10 +72,15 @@ const EventList = () => {
     fetchEvents();
   }, []);
 
-  const getAvailableDays = () => {
-    const availableDays = events.map(event => event.disponibilidade.map(disponibilidade => new Date(disponibilidade.dia)));
-    return [].concat(...availableDays);
-  };
+  // Função para retornar os dias de disponibilidade
+const getAvailableDays = () => {
+  // Usamos flatMap para "achatar" os arrays aninhados
+  const availableDays: Date[] = events.flatMap(event => 
+    event.disponibilidade.map(disponibilidade => new Date(disponibilidade.dia))
+  );
+  
+  return availableDays;
+};
 
   const handleDateSelect = (date:any) => {
     setSelectedDate(date);
@@ -234,7 +258,7 @@ const EventList = () => {
           <h2 className="text-xl font-semibold mb-4">Selecione uma Data & Hora</h2>
           <Calendar
             mode="single"
-            selected={selectedDate}
+            selected={selectedDate || undefined}
             onSelect={handleDateSelect}
             modifiers={{
               highlighted: getAvailableDays(),
@@ -265,7 +289,7 @@ const EventList = () => {
                         <DialogTrigger asChild>
                           <Button
                             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-                            onClick={() => handleOpenDialog(selectedEvent._id)}
+                            onClick={() => selectedEvent && handleOpenDialog(selectedEvent._id)}
                           >
                             Agendar
                           </Button>

@@ -33,6 +33,8 @@ const BannerData2 = {
 }
 
 
+
+
 const Home: React.FC = () => {
 //
   return (
