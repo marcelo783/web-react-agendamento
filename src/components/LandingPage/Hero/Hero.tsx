@@ -55,7 +55,7 @@ import SlideRight from "../../../utility/animation"
                 <button className='flex justify-end items-center  gap-2 font-semibold'>
                   <span className='w-10 h-10 bg-slate-400 rounded-full flex justify-center
                  
-                  items-center items-center
+                  items-center
                   '>
                     <FaPlay className='text-two'/>
                   </span>
