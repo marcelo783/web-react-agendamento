@@ -5,7 +5,7 @@ import Register from './screens/Register';
 //import OAuthCallback from './screens/OAuthCallback';
 import Adm from './screens/Adm';
 import PrivateRoute from './routes/PrivateRoute'; // Importe o componente de rota privada
-//import Login from './screens/Login';
+import Login from './screens/Login';
 import CreatEvent from './screens/CreateEvent';
 import EventList from './screens/EventList';
 import EditEvent from './screens/EditEvent';
@@ -29,7 +29,7 @@ const App: React.FC = () => {
       <div className='flex-1'>
       <Routes>
         <Route path="/home" element={<Home />} />
-        {/* <Route path="/login" element={<Login />} /> */}
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<PrivateRoute><Register /></PrivateRoute>}/>
         <Route path="/create-event" element={<PrivateRoute><CreatEvent /></PrivateRoute>}/>
         <Route path="/adm" element={<PrivateRoute><Adm /></PrivateRoute>}/>

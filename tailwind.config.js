@@ -9,23 +9,23 @@ module.exports = {
   ],
   prefix: "",
   theme: {
-	container: {
-        center: true,
-        padding: {
-          DEFAULT: "1rem",
-          sm: "2rem",
-          lg: "4rem",
-          xl: "5rem",
-          "2xl": "6rem",
-        },
-      },
+  	container: {
+  		center: 'true',
+  		padding: {
+  			DEFAULT: '1rem',
+  			sm: '2rem',
+  			lg: '4rem',
+  			xl: '5rem',
+  			'2xl': '6rem'
+  		}
+  	},
   	extend: {
   		colors: {
   			neutralSilver: '#F5F7FA',
-			borda: '#0063ff33',
-			one: "#ffcf3a",
-			two: "#2563eb",
-			slid: '#0063ff1a',
+  			borda: '#0063ff33',
+  			one: '#ffcf3a',
+  			two: '#2563eb',
+  			slid: '#0063ff1a',
   			neutralDGrey: '#4D4D4D',
   			brandPrimary: '#4CAF4F',
   			neutralGrey: '#717171',
@@ -62,6 +62,16 @@ module.exports = {
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
+  			},
+  			sidebar: {
+  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				foreground: 'hsl(var(--sidebar-foreground))',
+  				primary: 'hsl(var(--sidebar-primary))',
+  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+  				border: 'hsl(var(--sidebar-border))',
+  				ring: 'hsl(var(--sidebar-ring))'
   			}
   		},
   		borderRadius: {
@@ -85,27 +95,9 @@ module.exports = {
   				to: {
   					height: '0'
   				}
-  			},
-  			'accordion-down': {
-  				from: {
-  					height: '0'
-  				},
-  				to: {
-  					height: 'var(--radix-accordion-content-height)'
-  				}
-  			},
-  			'accordion-up': {
-  				from: {
-  					height: 'var(--radix-accordion-content-height)'
-  				},
-  				to: {
-  					height: '0'
-  				}
   			}
   		},
   		animation: {
-  			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out',
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out'
   		}

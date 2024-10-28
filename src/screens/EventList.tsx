@@ -28,7 +28,6 @@ type Disponibilidade = {
   }[];
 };
 
-
 type Event = {
   _id: string;
   titulo: string;

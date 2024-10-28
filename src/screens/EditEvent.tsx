@@ -20,6 +20,7 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "@/hooks/use-toast";
+import MainLayout from "@/components/MainLayout";
 
 
 type Disponibilidade = {
@@ -293,7 +294,8 @@ const EditEvent = () => {
   
 
   return (
-    <div className="container mx-auto py-8">
+    <MainLayout>
+      <div className="container mx-auto py-8">
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle className="text-center">Editar Agendamento</CardTitle>
@@ -520,6 +522,7 @@ const EditEvent = () => {
         </CardContent>
       </Card>
     </div>
+    </MainLayout>
   );
 };
 
