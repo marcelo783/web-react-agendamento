@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MainLayout from "@/components/MainLayout";
+import { toast } from "@/hooks/use-toast";
 
 const Register = () => {
   const [cookies] = useCookies(['authToken']);
@@ -81,9 +82,16 @@ const Register = () => {
         body: JSON.stringify(formData),
       });
 
+      toast({
+        title: "Psicólogo criado com sucesso",
+        description: "O Psicólogo foi criado com sucesso.",
+        //status: "success",
+      });
+
       if (response.ok) {
-        // Redireciona para a rota privada após o cadastro
+        setTimeout(() => {
         navigate('/adm');
+      }, 2000); // 2000 mil
       } else {
         // Tratar o caso de erro
         console.error('Erro ao registrar:', response.statusText);

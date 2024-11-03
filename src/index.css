@@ -82,6 +82,13 @@
 }
 
 
+/* main.css or global.css */
+
+
+
+.main-content {
+  transition: margin-left 0.3s ease;
+}
 
 
 @layer base {

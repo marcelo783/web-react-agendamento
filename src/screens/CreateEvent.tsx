@@ -431,7 +431,7 @@ const CreateEvent = () => {
               className="w-full flex items-center justify-center"
               onClick={handleAddDisponibilidade}
             >
-              <PlusCircle className="mr-2" />
+              <PlusCircle className=" mr-2" />
               Adicionar Outra Data
             </Button>
 

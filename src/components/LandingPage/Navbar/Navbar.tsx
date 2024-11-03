@@ -13,18 +13,14 @@ const Navbar = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:5000/auth/google', { method: 'HEAD' });
-
-      if (!response.ok) {
-        throw new Error("Servidor não está respondendo");
-      }
-
+      // Redireciona o usuário diretamente para a URL de login do Google
       window.location.href = 'http://localhost:5000/auth/google';
     } catch (err) {
       console.error("Erro ao tentar autenticar:", err);
       setError("OOPS! Estamos com problemas para acessar o servidor. Tente novamente mais tarde!");
     }
   };
+  
 
   const scrollToSection = (id: any) => {
     const element = document.querySelector(id);

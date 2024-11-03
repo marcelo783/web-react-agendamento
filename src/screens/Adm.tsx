@@ -115,13 +115,14 @@ const Adm: React.FC = () => {
 
   return (
     <MainLayout>
+     
     <div className="flex flex-col p-4 space-y-4">
       
       {/* Primeira Div: Input e Calendário */}
       <div className="flex flex-col lg:flex-row p-4 items-center justify-between space-y-4 lg:space-y-0 lg:space-x-4">
         <div className="w-full lg:w-1/4">
           <Input
-            placeholder="Search or add event"
+            placeholder="Pesquisar..."
             className="w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

@@ -17,6 +17,7 @@ import { ptBR } from 'date-fns/locale';
 import { useCookies } from 'react-cookie';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ErroImg from "../assets/person-calendar.png";
+import Header from '@/components/Header';
 
 
 type Disponibilidade = {
@@ -233,7 +234,9 @@ const getAvailableDays = () => {
   
 
   return (
+    
     <div className="container mx-auto p-4">
+     
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-4 border rounded shadow-sm">
           {selectedEvent ? (
