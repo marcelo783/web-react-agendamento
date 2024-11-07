@@ -18,6 +18,10 @@ import { useCookies } from 'react-cookie';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ErroImg from "../assets/person-calendar.png";
 import Header from '@/components/Header';
+import MainLayout from '@/components/MainLayout';
+import { IoMdArrowRoundBack } from 'react-icons/io';
+import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 
 type Disponibilidade = {
@@ -49,6 +53,7 @@ const EventList = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [, setIsDialogOpen] = useState<boolean>(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -160,10 +165,22 @@ const getAvailableDays = () => {
       console.log('Resposta do servidor:', response.data);
 
      
-
       handleCloseDialog();
+
+      toast({
+        title: "Agendamento criado com sucesso!",
+        description: "O agendamento foi criado com sucesso.",
+        //status: "success",
+      });
+
     } catch (error) {
       console.error('Erro ao enviar os dados do agendamento:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao Agendar",
+        description: "Não foi possível fazer o agendamento!",
+        //action: <ToastAction altText="Try again">Try again</ToastAction>,
+      })
     }
   };
 
@@ -235,9 +252,25 @@ const getAvailableDays = () => {
 
   return (
     
-    <div className="container mx-auto p-4">
-     
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+   
+    <>
+      <header
+      className={`p-4 fixed w-full z-20 bg-blue-600 h-10 flex items-center justify-between shadow-md `}
+    >
+      {/* Esquerda: SidebarTrigger e título */}
+      <div className="flex items-center gap-6">
+        <IoMdArrowRoundBack size={30}
+         className="cursor-pointer" 
+         onClick={() => navigate('/home')} 
+        />
+        <h1 className="text-lg font-semibold pl-11  text-white">Agenda Ki</h1>
+      </div>
+
+      {/* Direita: UserSheet para abrir o perfil */}
+      
+      
+    </header>
+      <div className="grid grid-cols-1 p-12 md:grid-cols-3 gap-4">
         <div className="p-4 border rounded shadow-sm">
           {selectedEvent ? (
             <div>
@@ -374,8 +407,10 @@ const getAvailableDays = () => {
           )}
         </div>
       </div>
-    </div>
+    </>
+    
   );
+
 };
 
 export default EventList;

@@ -1,7 +1,7 @@
 // AppSidebar.tsx
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
-import { FaProductHunt, FaUserCircle } from "react-icons/fa";
-import { IoHome } from "react-icons/io5";
+import { FaProductHunt } from "react-icons/fa";
+
 import { IoIosAddCircle } from "react-icons/io";
 import { FaCalendarDays } from "react-icons/fa6";
 import { Link, useLocation } from "react-router-dom";
@@ -12,11 +12,12 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
 } from "@/components/ui/sidebar";
-import { UserSheet } from "./UserSheet";
+
+import { MdDashboard } from "react-icons/md";
 
 const menuItems = [
   {
-    icons: <IoHome size={20} />,
+    icons: <MdDashboard size={20} />,
     label: "Adm",
     path: "/adm",
   },

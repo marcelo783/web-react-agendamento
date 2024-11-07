@@ -150,6 +150,7 @@ const CreateEvent = () => {
       disponibilidade: [
         ...prevState.disponibilidade,
         {
+         
           dia: new Date(),
           horarios: [{ inicio: "", fim: "", duracao: 1 }],
         },
@@ -197,7 +198,7 @@ const CreateEvent = () => {
       );
 
       toast({
-        title: "Agendamento criado com sucesso",
+        title: "Agendamento criado com sucesso!",
         description: "O agendamento foi criado com sucesso.",
         //status: "success",
       });
@@ -206,6 +207,12 @@ const CreateEvent = () => {
       // Redirecionar ou realizar outra ação após o sucesso
     } catch (error) {
       console.error("Erro ao criar o agendamento:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao Criar",
+        description: "Não foi possível criar o agendamento!",
+        //action: <ToastAction altText="Try again">Try again</ToastAction>,
+      })
     }
   };
 

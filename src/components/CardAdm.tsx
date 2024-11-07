@@ -166,7 +166,7 @@ const CardAdm: React.FC<CardAdmProps> = ({
               Não
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteClick}>
-              Sim, Apagar
+              Sim
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

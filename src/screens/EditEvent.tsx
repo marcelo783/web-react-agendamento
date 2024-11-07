@@ -287,6 +287,12 @@ const EditEvent = () => {
       navigate("/adm");
     } catch (error) {
       console.error("Erro ao atualizar o agendamento", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao editar ",
+        description: "Não foi possível editar o agendamento.",
+        //action: <ToastAction altText="Try again">Try again</ToastAction>,
+      })
     }
   };
   

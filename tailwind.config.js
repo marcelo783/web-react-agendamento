@@ -28,6 +28,7 @@ module.exports = {
   			slid: '#0063ff1a',
   			neutralDGrey: '#4D4D4D',
   			brandPrimary: '#4CAF4F',
+			cardGree: '#77fc98',
   			neutralGrey: '#717171',
   			gray900: '#717171',
   			border: 'hsl(var(--border))',
@@ -45,7 +46,7 @@ module.exports = {
   			},
   			destructive: {
   				DEFAULT: 'hsl(var(--destructive))',
-  				foreground: 'hsl(var(--destructive-foreground))'
+  				foreground: 'hsl(var(----destructive))'
   			},
   			muted: {
   				DEFAULT: 'hsl(var(--muted))',

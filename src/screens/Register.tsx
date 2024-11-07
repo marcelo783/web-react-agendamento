@@ -98,6 +98,12 @@ const Register = () => {
       }
     } catch (error) {
       console.error('Erro na requisição:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao registrar",
+        description: "Não foi possível registrar-se!.",
+        //action: <ToastAction altText="Try again">Try again</ToastAction>,
+      })
     }
   };
 
