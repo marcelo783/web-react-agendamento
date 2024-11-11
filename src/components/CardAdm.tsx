@@ -9,6 +9,8 @@ import { useCookies } from 'react-cookie';
 import axios from "axios";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"; // AlertDialog do Shadcn
 import { useToast } from "@/hooks/use-toast"
+import { RiComputerLine } from "react-icons/ri";
+import { BsPersonWorkspace } from "react-icons/bs";
 
 
 
@@ -181,8 +183,16 @@ const CardAdm: React.FC<CardAdmProps> = ({
         <strong>Paciente:</strong> {paciente}
       </p>
       <div className="flex justify-between items-center text-sm text-gray-800 mb-2">
+        <div className="flex items-center">
+        <BsPersonWorkspace className="mr-2"/>
         <span>{formatoConsulta}</span>
-        <span>{status}</span>
+          </div>
+          
+      <div className="text-gray-800">
+      <span>{status}</span>
+      </div>
+
+       
       </div>
 
       {/* Data e valor lado a lado */}
@@ -199,8 +209,8 @@ const CardAdm: React.FC<CardAdmProps> = ({
       <div className="flex items-center text-sm text-gray-800">
         <AiOutlineClockCircle className="mr-2" />
         <span>
-          <strong>Início:</strong> {inicio} <strong>Fim:</strong> {fim}{" "}
-          <strong>Duração:</strong> {duracao}m
+          <strong>Início</strong> {inicio} <strong>Fim</strong> {fim}{" "}
+          <strong>Duração</strong> {duracao}m
         </span>
       </div>
     </div>

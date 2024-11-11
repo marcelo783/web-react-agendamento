@@ -66,6 +66,15 @@ const Adm: React.FC = () => {
     }
   };
   
+  // Função para atualizar um evento no estado 'events'
+  // const handleEventUpdate = (updatedEvent:any) => {
+  //   setEvents((prevEvents:any) => {
+  //     return prevEvents.map((event:any) =>
+  //       event._id === updatedEvent._id ? updatedEvent : event
+  //     );
+  //   });
+  // };
+  
   
 
   // Efeito para buscar os eventos ao carregar a página
@@ -155,6 +164,7 @@ const Adm: React.FC = () => {
           fim={event.disponibilidade[0].horarios[0]?.fim || 'N/A'}
           duracao={event.disponibilidade[0].horarios[0]?.duracao || 'N/A'}
           valor={event.valor}
+         
         />
       );
     })

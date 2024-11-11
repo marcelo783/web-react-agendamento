@@ -28,7 +28,7 @@ const menuItems = [
   },
   {
     icons: <FaCalendarDays size={20} />,
-    label: "EventList",
+    label: "Disponibilidade",
     path: "/EventList",
   },
   {

@@ -144,19 +144,6 @@ const CreateEvent = () => {
     }));
   };
 
-  const handleAddDisponibilidade = () => {
-    setFormData((prevState) => ({
-      ...prevState,
-      disponibilidade: [
-        ...prevState.disponibilidade,
-        {
-         
-          dia: new Date(),
-          horarios: [{ inicio: "", fim: "", duracao: 1 }],
-        },
-      ],
-    }));
-  };
 
   const handleSubmit = async (e:any) => {
     e.preventDefault();
@@ -422,25 +409,11 @@ const CreateEvent = () => {
                   </Button>
                 </div>
 
-                <div className="flex justify-end mt-2">
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleRemoveDisponibilidade(dispIndex)}
-                  >
-                    Remover Data
-                  </Button>
-                </div>
+                
               </div>
             ))}
 
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-center"
-              onClick={handleAddDisponibilidade}
-            >
-              <PlusCircle className=" mr-2" />
-              Adicionar Outra Data
-            </Button>
+            
 
             <Button
               className="w-full bg-blue-500 hover:bg-blue-800 mt-4"
