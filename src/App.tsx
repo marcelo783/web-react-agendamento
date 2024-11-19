@@ -9,6 +9,7 @@ import Login from './screens/Login';
 import CreatEvent from './screens/CreateEvent';
 import EventList from './screens/EventList';
 import EditEvent from './screens/EditEvent';
+import Dashboard from './components/Dashboard';
 
 
 
@@ -37,6 +38,7 @@ const App: React.FC = () => {
         <Route path="/edit-event/:googleCalendarId" element={<PrivateRoute><EditEvent /></PrivateRoute>} /> 
         <Route path="/edit-event-id/:_id" element={<PrivateRoute><EditEvent /></PrivateRoute>} />
         
+        <Route path="/dashboard" element={<Dashboard />}/>
 
       </Routes>
 

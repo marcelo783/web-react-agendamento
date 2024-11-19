@@ -27,6 +27,7 @@ interface CardAdmProps {
   fim: string;
   duracao: number;
   valor: number;
+  reservado: boolean;
 }
 
 const getBorderColor = (status: string) => {
@@ -56,10 +57,24 @@ const CardAdm: React.FC<CardAdmProps> = ({
   status,
   data,
   inicio,
+  reservado,
   fim,
   duracao,
   valor,
+}: {
+  titulo: string;
+  descricao: string;
+  paciente: string; // Espera o nome do paciente como string
+  formatoConsulta: string;
+  status: string;
+  data: string;
+  inicio: string;
+  fim: string;
+  duracao: number | string;
+  valor: number;
+  reservado: boolean,
 }) => {
+
   const navigate = useNavigate();
   const [cookies] = useCookies(['accessToken', 'authToken']);
   
@@ -76,10 +91,6 @@ const CardAdm: React.FC<CardAdmProps> = ({
       console.error("Nenhum ID válido para editar o evento.");
     }
   };
-  
-  
-  
-  
   
   
 
@@ -180,7 +191,7 @@ const CardAdm: React.FC<CardAdmProps> = ({
         <p className="text-sm text-gray-700">{descricao}</p>
       </ScrollArea>
       <p className="text-sm text-gray-800 mb-2">
-        <strong>Paciente:</strong> {paciente}
+      <strong>Paciente:</strong> {paciente || 'Nenhum paciente'}
       </p>
       <div className="flex justify-between items-center text-sm text-gray-800 mb-2">
         <div className="flex items-center">
@@ -211,6 +222,8 @@ const CardAdm: React.FC<CardAdmProps> = ({
         <span>
           <strong>Início</strong> {inicio} <strong>Fim</strong> {fim}{" "}
           <strong>Duração</strong> {duracao}m
+          <strong> reserv</strong> {reservado}
+
         </span>
       </div>
     </div>

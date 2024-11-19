@@ -4,6 +4,7 @@ import { FaProductHunt } from "react-icons/fa";
 
 import { IoIosAddCircle } from "react-icons/io";
 import { FaCalendarDays } from "react-icons/fa6";
+import { IoStatsChart } from "react-icons/io5";
 import { Link, useLocation } from "react-router-dom";
 
 import {
@@ -32,9 +33,9 @@ const menuItems = [
     path: "/EventList",
   },
   {
-    icons: <FaProductHunt size={20} />,
-    label: "Config",
-    path: "/DataTest",
+    icons: <IoStatsChart size={20} />,
+    label: "Dashboard",
+    path: "/dashboard",
   },
 ];
 

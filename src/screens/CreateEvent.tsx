@@ -155,7 +155,6 @@ const CreateEvent = () => {
 
     const payload = {
       psicologo: psicologoId,
-      paciente: null,
       titulo: formData.titulo,
       descricao: formData.descricao,
       formatoConsulta: formData.formatoConsulta,
@@ -163,11 +162,13 @@ const CreateEvent = () => {
       valor: parseFloat(formData.valor),
       repete: formData.repete,
       disponibilidade: formData.disponibilidade.map((disp) => ({
-        dia: disp.dia ? disp.dia.toISOString() : null,
+        dia: disp.dia, // Certifique-se de que o dia já esteja em formato ISO no formData
         horarios: disp.horarios.map((horario) => ({
           inicio: horario.inicio,
           fim: horario.fim,
           duracao: horario.duracao,
+          reservado: false, // Incluímos "reservado" como false
+          paciente: null, // Inicialmente, paciente é null
         })),
       })),
     };

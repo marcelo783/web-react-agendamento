@@ -8,8 +8,6 @@ import Pagination from '@/components/ui/pagination';
 import MainLayout from '@/components/MainLayout';
 
 
-
-
 const ITEMS_PER_PAGE = 6; // Quantidade de cards por página
 
 const Adm: React.FC = () => {
@@ -21,18 +19,13 @@ const Adm: React.FC = () => {
 
   const [pacientes, setPacientes] = useState<PacientesState>({});  // Inicializando como um objeto vazio
 
-  // type EventType = {
-  //   paciente?: string;  // Ou use o tipo correto do campo 'paciente'
-  //   // Outros campos do evento
-  // };
+ 
   
   // Tipo para o estado 'pacientes'
   type PacientesState = {
     [key: string]: string;  // Um objeto onde a chave é o ID do paciente e o valor é o nome do paciente
   };
   
-  // Estado para controlar a página atual
-
   // Função para buscar os eventos da API com os filtros aplicados
   const fetchEvents = async (searchTerm = '', selectedDate = null) => {
     try {
@@ -66,16 +59,6 @@ const Adm: React.FC = () => {
     }
   };
   
-  // Função para atualizar um evento no estado 'events'
-  // const handleEventUpdate = (updatedEvent:any) => {
-  //   setEvents((prevEvents:any) => {
-  //     return prevEvents.map((event:any) =>
-  //       event._id === updatedEvent._id ? updatedEvent : event
-  //     );
-  //   });
-  // };
-  
-  
 
   // Efeito para buscar os eventos ao carregar a página
   useEffect(() => {
@@ -93,14 +76,19 @@ const Adm: React.FC = () => {
 
   // Busca o nome do paciente para cada evento ao carregar a página
   useEffect(() => {
-    events.forEach(async (event:any) => {
-      console.log('ID do Paciente:', event.paciente);  // Verifique se o ID está correto
-      if (event.paciente && !pacientes[event.paciente]) {
-        const nomePaciente = await fetchPacienteById(event.paciente);
-        setPacientes((prev) => ({ ...prev, [event.paciente]: nomePaciente }));
-      }
+    events.forEach(async (event: any) => {
+      // Busca os IDs dos pacientes nos horários
+      event.disponibilidade
+        ?.flatMap((disp: any) => disp.horarios)
+        ?.forEach(async (horario: any) => {
+          if (horario.paciente && !pacientes[horario.paciente]) {
+            const nomePaciente = await fetchPacienteById(horario.paciente);
+            setPacientes((prev) => ({ ...prev, [horario.paciente]: nomePaciente }));
+          }
+        });
     });
   }, [events]);
+  
   
 
   // Lógica de paginação
@@ -108,25 +96,12 @@ const Adm: React.FC = () => {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const selectedEvents = events.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  // Funções para navegação da paginação
-  // const goToNextPage = () => {
-  //   if (currentPage < totalPages) {
-  //     setCurrentPage(currentPage + 1);
-  //   }
-  // };
-
-  // const goToPreviousPage = () => {
-  //   if (currentPage > 1) {
-  //     setCurrentPage(currentPage - 1);
-  //   }
-  // };
-  
 
   return (
     <MainLayout>
      
     <div className="flex flex-col p-4 space-y-4">
-      
+     
       {/* Primeira Div: Input e Calendário */}
       <div className="flex flex-col lg:flex-row p-4 items-center justify-between space-y-4 lg:space-y-0 lg:space-x-4">
         <div className="w-full lg:w-1/4">
@@ -156,7 +131,27 @@ const Adm: React.FC = () => {
         googleCalendarId={event.googleCalendarId}  // Passe _id corretamente para o CardAdm
           titulo={event.titulo}
           descricao={event.descricao}
-          paciente={event.paciente ? (pacientes[event.paciente] || 'Carregando...') : 'ID não disponível'}
+          paciente={
+            // Procura o paciente no horário reservado
+            event.disponibilidade
+              ?.flatMap((disp: any) => disp.horarios)
+              ?.find((horario: any) => horario.reservado)?.paciente
+              ? pacientes[
+                  event.disponibilidade
+                    .flatMap((disp: any) => disp.horarios)
+                    .find((horario: any) => horario.reservado)?.paciente
+                ] || 'Carregando...'
+              : 'ID não disponível'
+          }
+
+          reservado={
+            event.disponibilidade
+              ?.flatMap((disp: any) => disp.horarios)
+              ?.some((horario: any) => horario.reservado)
+              ? "Reservado"
+              : "Disponível"
+          }
+
           formatoConsulta={event.formatoConsulta}
           status={event.status}
           data={new Date(event.disponibilidade[0].dia).toLocaleDateString()}
@@ -173,9 +168,6 @@ const Adm: React.FC = () => {
   )}
 </div>
 
-   
-      
-
        {/* Utilizando o novo componente de paginação */}
        <Pagination
         currentPage={currentPage}
@@ -188,7 +180,4 @@ const Adm: React.FC = () => {
   );
  
 };
-
-
-
 export default Adm;

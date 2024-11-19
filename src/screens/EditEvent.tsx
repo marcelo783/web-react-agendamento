@@ -35,8 +35,10 @@ type Disponibilidade = {
     inicio: string;
     fim: string;
     duracao: number;
+    reservado: boolean; // Novo campo adicionado
+    paciente: string | null; // Novo campo adicionado
   }[];
-};
+}
 
 type FormDataType = {
   _id?: string;
@@ -72,6 +74,8 @@ const EditEvent = () => {
             inicio: "",
             fim: "",
             duracao: 1,
+            reservado: false, // Valor inicial padrão
+            paciente: null, // Valor inicial padrão
           },
         ],
       },
@@ -200,9 +204,19 @@ const EditEvent = () => {
           descricao: response.data.descricao || "",
           pacienteEmail: response.data.pacienteEmail || "",
           formatoConsulta: response.data.formatoConsulta || "",
+          status: response.data.status || "",
           valor: response.data.valor ? String(response.data.valor) : "",
-          disponibilidade: response.data.disponibilidade || [],
-          repete: response.data.repete || false, // Adicione esta linha para incluir `repete` com valor padrão
+          repete: response.data.repete || false,
+          disponibilidade: response.data.disponibilidade.map((disp: any) => ({
+            dia: disp.dia,
+            horarios: disp.horarios.map((horario: any) => ({
+              inicio: horario.inicio,
+              fim: horario.fim,
+              duracao: horario.duracao,
+              reservado: horario.reservado || false, // Certifique-se de incluir o valor
+              paciente: horario.paciente || null, // Certifique-se de incluir o valor
+            })),
+          })),
         });
       } catch (error) {
         console.error("Erro ao buscar o agendamento", error);
@@ -215,39 +229,44 @@ const EditEvent = () => {
   // Função para salvar os dados atualizados
   const handleSave = async (e: any) => {
     e.preventDefault();
-
+  
     const token = cookies.accessToken;
     const authToken = cookies.authToken;
-
+  
     if (!authToken) {
       console.error("Token JWT não encontrado.");
       return;
     }
-
+  
     try {
+      // Formatar disponibilidade para enviar corretamente ao backend
       const formattedDisponibilidade = formData.disponibilidade.map((disp) => {
         const diaFormatted =
           disp.dia instanceof Date
             ? disp.dia.toISOString().split("T")[0] // Se for Date, formatar para YYYY-MM-DD
-            : disp.dia; // Se já estiver no formato correto, apenas usar
-
+            : disp.dia;
+  
         const horarios = disp.horarios.map((horario) => ({
           inicio: horario.inicio,
           fim: horario.fim,
           duracao: horario.duracao,
+          reservado: horario.reservado ?? false, // Manter o campo `reservado`, padrão `false` se não especificado
+          paciente: horario.paciente ?? null, // Manter o campo `paciente`, padrão `null` se não especificado
         }));
-
+  
         return {
           dia: diaFormatted,
           horarios,
         };
       });
-
+  
+      // Criar o payload atualizado
       const updatedData = {
         ...formData,
         disponibilidade: formattedDisponibilidade,
       };
-
+  
+      // Verificar se estamos atualizando no Google Calendar ou apenas no backend
       if (googleCalendarId && googleCalendarId !== "undefined") {
         // Atualizar evento no Google Calendar e backend
         await axios.put(
@@ -273,24 +292,23 @@ const EditEvent = () => {
           }
         );
       }
-
+  
       toast({
         title: "Agendamento editado com sucesso",
         description: "O agendamento foi editado com sucesso.",
-        // status: "success",
       });
-
+  
       navigate("/adm");
     } catch (error) {
       console.error("Erro ao atualizar o agendamento", error);
       toast({
         variant: "destructive",
-        title: "Erro ao editar ",
+        title: "Erro ao editar",
         description: "Não foi possível editar o agendamento.",
-        //action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
     }
   };
+  
 
   return (
     <MainLayout>
