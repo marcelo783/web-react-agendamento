@@ -30,7 +30,7 @@ type Disponibilidade = {
     inicio: string;
     fim: string;
     duracao: number;
-    reservado: boolean;
+    status: string;
     paciente: string | null;
   }[];
 };
@@ -40,7 +40,6 @@ type Event = {
   titulo: string;
   descricao: string;
   formatoConsulta: string;
-  status: string;
   valor: number;
   disponibilidade: Disponibilidade[];
 };
@@ -58,7 +57,7 @@ const EventList = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [availableTimes, setAvailableTimes] = useState<
-    { inicio: string; fim: string; duracao: number }[]
+    { _id: string; inicio: string; fim: string; status: string; duracao: number }[]
   >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -173,7 +172,7 @@ const EventList = () => {
     }
 
     try {
-      const token = cookies["accessToken"];
+      const accessToken = cookies["accessToken"];
 
       const response = await axios.patch(
         "http://localhost:5000/agendamentos/agendar",
@@ -186,7 +185,7 @@ const EventList = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
@@ -293,31 +292,43 @@ const EventList = () => {
         {/* Direita: UserSheet para abrir o perfil */}
       </header>
       <div className="grid grid-cols-1 p-12 md:grid-cols-3 gap-4">
-        <div className="p-4 border rounded shadow-sm">
-          {selectedEvent ? (
-            <div>
-              <h2 className="text-xl font-bold mb-2">{selectedEvent.titulo}</h2>
-              <ScrollArea className="h-24 mb-2  bg-gray-100 rounded-lg">
-                <p>
-                  <strong></strong> {selectedEvent.descricao}
-                </p>
-              </ScrollArea>
+       <div className="p-4 border rounded shadow-sm">
+  {selectedEvent ? (
+    <div>
+      <h2 className="text-xl font-bold mb-2">{selectedEvent.titulo}</h2>
+      <ScrollArea className="h-24 mb-2 bg-gray-100 rounded-lg">
+        <p>
+          <strong>Descrição:</strong> {selectedEvent.descricao}
+        </p>
+      </ScrollArea>
 
-              <p>
-                <strong>Formato da Consulta:</strong>{" "}
-                {selectedEvent.formatoConsulta}
-              </p>
-              <p>
-                <strong>Status:</strong> {selectedEvent.status}
-              </p>
-              <p>
-                <strong>Valor:</strong> R$ {selectedEvent.valor.toFixed(2)}
-              </p>
-            </div>
-          ) : (
-            <p>Selecione uma data para ver as informações da consulta.</p>
-          )}
+      <p>
+        <strong>Formato da Consulta:</strong> {selectedEvent.formatoConsulta}
+      </p>
+      <p>
+        <strong>Valor:</strong> R$ {selectedEvent.valor.toFixed(2)}
+      </p>
+
+      {selectedEvent.disponibilidade.map((disp, dispIndex) => (
+        <div key={dispIndex}>
+          <p>
+            <strong>Dia:</strong> {disp.dia}
+          </p>
+          <ul>
+            {disp.horarios.map((horario, horarioIndex) => (
+              <li key={horario._id}>
+                <strong>Horário:</strong> {horario.inicio} - {horario.fim}{" "}
+                <strong>Status:</strong> {horario.status}
+              </li>
+            ))}
+          </ul>
         </div>
+      ))}
+    </div>
+  ) : (
+    <p>Selecione uma data para ver as informações da consulta.</p>
+  )}
+</div>
 
         <div className="p-4 border rounded shadow-sm">
           <h2 className="text-xl font-semibold mb-4">

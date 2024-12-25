@@ -23,7 +23,10 @@ import { toast } from "@/hooks/use-toast";
 import MainLayout from "@/components/MainLayout";
 
 const CreateEvent = () => {
-  const [cookies] = useCookies(["authToken"]); // Obtém o token JWT do cookie
+  const [cookies] = useCookies(["accessToken", "authToken"]);
+  
+  
+  // Obtém o token JWT do cookie
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
@@ -32,17 +35,19 @@ const CreateEvent = () => {
     repete: false,
     disponibilidade: [
       {
-        dia: new Date(),
+        dia: new Date(), // Data inicial
         horarios: [
           {
-            inicio: "",
-            fim: "",
-            duracao: 1,
+            inicio: "", // Hora de início
+            fim: "", // Hora de término
+            duracao: 1, // Duração padrão
+            status: "disponivel", // Adicionando status inicial
           },
         ],
       },
     ],
   });
+  
 
   const handleInputChange = (e:any) => {
     const { name, value } = e.target;
@@ -149,8 +154,10 @@ const CreateEvent = () => {
     e.preventDefault();
 
     // Extrai o payload do token JWT
-    const token = cookies.authToken;
-    const decodedToken = jwtDecode(token);
+    const accessToken = cookies.accessToken;
+    const authtoken = cookies.authToken;
+
+    const decodedToken = jwtDecode(authtoken);
     const psicologoId = decodedToken.sub; // Obtém o ID do psicólogo do JWT
 
     const payload = {
@@ -158,16 +165,15 @@ const CreateEvent = () => {
       titulo: formData.titulo,
       descricao: formData.descricao,
       formatoConsulta: formData.formatoConsulta,
-      status: "disponivel",
       valor: parseFloat(formData.valor),
       repete: formData.repete,
       disponibilidade: formData.disponibilidade.map((disp) => ({
-        dia: disp.dia, // Certifique-se de que o dia já esteja em formato ISO no formData
+        dia: disp.dia, 
         horarios: disp.horarios.map((horario) => ({
           inicio: horario.inicio,
           fim: horario.fim,
           duracao: horario.duracao,
-          reservado: false, // Incluímos "reservado" como false
+          status: "disponivel",
           paciente: null, // Inicialmente, paciente é null
         })),
       })),
@@ -180,7 +186,7 @@ const CreateEvent = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Inclui o token JWT no header
+            Authorization: `Bearer ${accessToken}`, 
           },
         }
       );
@@ -199,7 +205,7 @@ const CreateEvent = () => {
         variant: "destructive",
         title: "Erro ao Criar",
         description: "Não foi possível criar o agendamento!",
-        //action: <ToastAction altText="Try again">Try again</ToastAction>,
+        
       })
     }
   };
