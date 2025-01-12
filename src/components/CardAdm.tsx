@@ -23,7 +23,14 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useToast } from "@/hooks/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import accessToken from "@/cookies/appAccessToken";
 
 // Interfaces para os tipos
 interface Horario {
@@ -56,23 +63,29 @@ interface CardAdmProps {
   valor: number;
 
   disponibilidade: Disponibilidade[];
+  onUpdateStatus: (
+    dispIndex: number,
+    horarioIndex: number,
+    newStatus: string
+  ) => void;
 }
 
 const getBorderColor = (status: string) => {
   switch (status) {
     case "disponivel":
-      return "bg-green-500";
+      return "border-green-500";
     case "cancelado":
-      return "bg-red-500";
+      return "border-red-500";
     case "concluido":
-      return "bg-yellow-500";
+      return "border-yellow-500";
     case "expirado":
-      return "bg-purple-500";
+      return "border-purple-500";
     case "agendado":
-      return "bg-blue-500";
+      return "border-blue-500";
     default:
-      return "bg-gray-500";
+      return "border-gray-500";
   }
+  
 };
 
 const CardAdm: React.FC<CardAdmProps> = ({
@@ -89,7 +102,7 @@ const CardAdm: React.FC<CardAdmProps> = ({
   fim,
   duracao,
   valor,
- 
+  onUpdateStatus,
   disponibilidade,
 }) => {
   const navigate = useNavigate();
@@ -98,6 +111,51 @@ const CardAdm: React.FC<CardAdmProps> = ({
   const borderColor = getBorderColor(status);
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
   const { toast } = useToast();
+
+  const [updatedStatus, setUpdatedStatus] = useState<
+    { horarioId: string; status: string }[]
+  >([]);
+
+  const handleStatusChange = (horarioId: string, newStatus: string) => {
+    setUpdatedStatus((prev) => {
+      const existing = prev.find((item) => item.horarioId === horarioId);
+      if (existing) {
+        return prev.map((item) =>
+          item.horarioId === horarioId ? { ...item, status: newStatus } : item
+        );
+      }
+      return [...prev, { horarioId, status: newStatus }];
+    });
+  };
+
+  const handleSave = async () => {
+    const token = cookies.accessToken;
+  
+    try {
+      const requests = updatedStatus.map((update) =>
+        axios.patch(
+        `http://localhost:5000/agendamentos/${_id}/horarios/${update.horarioId}/status`,
+          { status: update.status },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+      );
+      await Promise.all(requests); // Aguarda todas as atualizações
+      toast({
+        title: "Agendamento editado com sucesso",
+        description:
+          "O agendamento foi atualizado no Google Calendar e Back-End.",
+      });
+      setUpdatedStatus([]); // Limpa o estado local após salvar
+    } catch (error) {
+      console.error("Erro ao atualizar status", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao editar",
+        description: "Não foi possível atualizar o agendamento.",
+      });
+    }
+  };
+  
 
   const handleEditClick = () => {
     if (googleCalendarId && googleCalendarId !== "undefined") {
@@ -153,12 +211,37 @@ const CardAdm: React.FC<CardAdmProps> = ({
     }
   };
 
-  
+  // {
+  //   disponibilidade.map((dia, dispIndex) => (
+  //     <div key={dia.dia} className="mb-4">
+  //       {dia.horarios.map((horario, horarioIndex) => (
+  //         <div key={horario._id}>
+  //           <Select
+  //             value={horario.status}
+  //             onValueChange={(value) =>
+  //               handleStatusChange(dispIndex, horarioIndex, value)
+  //             }
+  //           >
+  //             <SelectTrigger className="w-[100px] h-[28px] text-xs bg-white border border-red-300 rounded-md shadow-sm">
+  //               <SelectValue placeholder="Selecione Status" />
+  //             </SelectTrigger>
+  //             <SelectContent>
+  //               <SelectItem value="disponivel">Disponível</SelectItem>
+  //               <SelectItem value="agendado">Agendado</SelectItem>
+  //               <SelectItem value="cancelado">Cancelado</SelectItem>
+  //               <SelectItem value="concluido">Concluído</SelectItem>
+  //               <SelectItem value="ausente">Ausente</SelectItem>
+  //             </SelectContent>
+  //           </Select>
+  //           ;
+  //         </div>
+  //       ))}
+  //     </div>
+  //   ));
+  // }
 
   return (
-    <div className="relative p-4 border rounded shadow-md w-88">
-     
-
+    <div className="relative p-4 border rounded shadow-md w-88 transition-all duration-500 hover:scale-105 hover:shadow-custom-gray">
       {/* Conteúdo do card */}
       <h2 className="text-lg font-semibold text-center mt-4 mb-2">{titulo}</h2>
       <ScrollArea className="h-16 mb-2 p-2 bg-gray-100 rounded-lg">
@@ -172,9 +255,7 @@ const CardAdm: React.FC<CardAdmProps> = ({
           <BsPersonWorkspace className="mr-2" />
           <span>{formatoConsulta}</span>
         </div>
-        <div className="text-gray-800">
-          <span>{status}</span>
-        </div>
+        <div className="text-gray-800">{/* <span>{status}</span> */}</div>
       </div>
 
       <div className="flex justify-between items-center text-sm text-gray-800 mb-2">
@@ -236,81 +317,98 @@ const CardAdm: React.FC<CardAdmProps> = ({
       {/* Botão Ver Disponibilidade */}
 
       <DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <div className="flex justify-center items-center">
-      <button className="px-4 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">
-        Ver Disponibilidade
-      </button>
-    </div>
-  </DropdownMenuTrigger>
-
-  <DropdownMenuContent align="start" className="w-96 p-4">
-    <ScrollArea className="h-96 scroll-smooth">
-      {disponibilidade && disponibilidade.length > 0 ? (
-        disponibilidade.map((dia: Disponibilidade) => (
-          <div key={dia.dia} className="mb-4">
-            {/* Data do dia */}
-            <p className="font-semibold text-gray-800 mb-2">
-              {new Date(dia.dia).toLocaleDateString("pt-BR")}
-            </p>
-            {dia.horarios.map((horario: Horario) => {
-              const borderColor = getBorderColor(
-                horario.status ? "agendado" : "disponivel"
-              ); // Define a cor com base no status
-
-              return (
-                <div
-                  key={horario._id}
-                  className={`p-4 mb-3 border-2 rounded-md shadow-sm bg-white ${borderColor}`}
-                >
-                  <div className="flex justify-between items-center">
-                    {/* Horário */}
-                    <span className="text-sm font-medium text-gray-800">
-                      {horario.inicio} até {horario.fim}
-                    </span>
-
-                    {/* Select */}
-                    <Select
-                      defaultValue={
-                        horario.status ? "agendado" : "disponivel"
-                      }
-                      onValueChange={(value) => console.log("Novo status:", value)} // Substitua pelo handler necessário
-                    >
-                      <SelectTrigger className="w-[100px] h-[28px] text-xs bg-white border border-red-300 rounded-md shadow-sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="disponivel">Disponível</SelectItem>
-                        <SelectItem value="agendado">Agendado</SelectItem>
-                        <SelectItem value="cancelado">Cancelado</SelectItem>
-                        <SelectItem value="concluido">Concluído</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Nome do paciente ou status disponível e duração */}
-                  <div className="flex justify-between items-center mt-2">
-                    <p className="text-sm font-semibold text-gray-700">
-                    {horario.paciente ? pacientes[horario.paciente] || "Carregando..." : "Disponível"}
-                    </p>
-                    <p className="text-sm font-medium text-gray-500">
-                      {horario.duracao}m
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+        <DropdownMenuTrigger asChild>
+          <div className="flex justify-center items-center">
+            <button className="px-4 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">
+              Ver Disponibilidade
+            </button>
           </div>
-        ))
-      ) : (
-        <p className="text-sm text-gray-500">Sem disponibilidade</p>
-      )}
-    </ScrollArea>
-  </DropdownMenuContent>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="start" className="w-96 p-4">
+          <ScrollArea className="h-96 scroll-smooth">
+            {disponibilidade && disponibilidade.length > 0 ? (
+              disponibilidade.map((dia: Disponibilidade, dispIndex) => (
+                <div key={dia.dia} className="mb-4">
+                  {/* Data do dia */}
+                  <p className="font-semibold text-gray-800 mb-2">
+                    {new Date(dia.dia).toLocaleDateString("pt-BR")}
+                  </p>
+                  {dia.horarios.map((horario: Horario, horarioIndex) => {
+                    const borderColor = getBorderColor(
+                    horario.status
+                    );
+
+                    return (
+                      <div
+                        key={horario._id}
+                        className={`p-4 mb-3 border-2  rounded-md shadow-sm  ${borderColor} `}
+                      >
+                        <div className="flex justify-between items-center">
+                          {/* Horário */}
+                          <span className="text-sm font-medium text-gray-800">
+                            {horario.inicio} até {horario.fim}
+                          </span>
+
+                          {/* Select */}
+                          <Select
+                            value={
+                              updatedStatus.find((item) => item.horarioId === horario._id)?.status ||
+                              horario.status
+                            }
+                            onValueChange={(value) => handleStatusChange(horario._id, value)}
+                          >
+                            <SelectTrigger className="w-[100px] h-[28px] text-xs bg-white border border-red-300 rounded-md shadow-sm">
+                              <SelectValue placeholder="Selecione Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem  value="disponivel">
+                                Disponível
+                              </SelectItem>
+                              <SelectItem value="agendado">Agendado</SelectItem>
+                              <SelectItem value="cancelado">
+                                Cancelado
+                              </SelectItem>
+                              <SelectItem value="concluido">
+                                Concluído
+                              </SelectItem>
+                              <SelectItem value="ausente">Ausente</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Nome do paciente ou status disponível e duração */}
+                        <div className="flex justify-between items-center mt-2">
+                          <p className="text-sm font-semibold text-gray-700">
+                            {horario.paciente
+                              ? pacientes[horario.paciente] || "Carregando..."
+                              : horario.status}
+                          </p>
+                          <p className="text-sm font-medium text-gray-500">
+                            {horario.duracao}m
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">Sem disponibilidade</p>
+            )}
+          </ScrollArea>
+
+          {/* Botão Salvar */}
+          <div className="flex justify-end mt-4">
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              onClick={handleSave}
+            >
+              Salvar
+            </button>
+          </div>
+        </DropdownMenuContent>
       </DropdownMenu>
-
-
-
     </div>
   );
 };

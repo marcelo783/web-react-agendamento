@@ -54,22 +54,23 @@ const Adm: React.FC = () => {
     fetchEvents(searchTerm, selectedDate);
   }, [searchTerm, selectedDate]);
 
- // Busca o nome do paciente para cada evento ao carregar a página
- useEffect(() => {
-  events.forEach(async (event: any) => {
-    // Busca os IDs dos pacientes nos horários
-    event.disponibilidade
-      ?.flatMap((disp: any) => disp.horarios)
-      ?.forEach(async (horario: any) => {
-        if (horario.paciente && !pacientes[horario.paciente]) {
-          const nomePaciente = await fetchPacienteById(horario.paciente);
-          setPacientes((prev) => ({ ...prev, [horario.paciente]: nomePaciente }));
-        }
-      });
-  });
-}, [events]);
-
-  
+  // Busca o nome do paciente para cada evento ao carregar a página
+  useEffect(() => {
+    events.forEach(async (event: any) => {
+      // Busca os IDs dos pacientes nos horários
+      event.disponibilidade
+        ?.flatMap((disp: any) => disp.horarios)
+        ?.forEach(async (horario: any) => {
+          if (horario.paciente && !pacientes[horario.paciente]) {
+            const nomePaciente = await fetchPacienteById(horario.paciente);
+            setPacientes((prev) => ({
+              ...prev,
+              [horario.paciente]: nomePaciente,
+            }));
+          }
+        });
+    });
+  }, [events]);
 
   const totalPages = Math.ceil(events.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -95,10 +96,11 @@ const Adm: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
           {selectedEvents.length > 0 ? (
             selectedEvents.map((event, index) => (
               <CardAdm
+              
                 key={event._id || index}
                 _id={event._id}
                 googleCalendarId={event.googleCalendarId}
@@ -106,10 +108,12 @@ const Adm: React.FC = () => {
                 descricao={event.descricao}
                 paciente={
                   event.disponibilidade?.flatMap((disp) =>
-                    disp.horarios.map((horario) => pacientes[horario.paciente] || "Carregando...")
-                  ).join(", ") || "Nenhum paciente"
+                    disp.horarios.map(
+                      (horario) =>
+                        pacientes[horario.paciente] || "Carregando..."
+                    )
+                  ) || "Nenhum paciente"
                 }
-                
                 status={
                   event.disponibilidade?.flatMap((disp: any) =>
                     disp.horarios.map((horario: any) => horario.status)
@@ -133,14 +137,47 @@ const Adm: React.FC = () => {
                 valor={event.valor}
                 disponibilidade={event.disponibilidade}
                 pacientes={pacientes}
+                onUpdateStatus={(
+                  dispIndex: number,
+                  horarioIndex: number,
+                  newStatus: string
+                ) => {
+                  setEvents((prevEvents) =>
+                    prevEvents.map((e) =>
+                      e._id === event._id
+                        ? {
+                            ...e,
+                            disponibilidade: e.disponibilidade.map(
+                              (disp, dIndex) =>
+                                dIndex === dispIndex
+                                  ? {
+                                      ...disp,
+                                      horarios: disp.horarios.map(
+                                        (horario, hIndex) =>
+                                          hIndex === horarioIndex
+                                            ? { ...horario, status: newStatus }
+                                            : horario
+                                      ),
+                                    }
+                                  : disp
+                            ),
+                          }
+                        : e
+                    )
+                  );
+                  
+                }}
+               
               />
+              
             ))
           ) : (
             <p>Nenhum evento encontrado.</p>
           )}
+          
         </div>
 
-        <Pagination
+        <Pagination 
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={(page) => setCurrentPage(page)}

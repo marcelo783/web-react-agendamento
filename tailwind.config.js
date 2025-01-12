@@ -20,6 +20,9 @@ module.exports = {
   		}
   	},
   	extend: {
+		 boxShadow: {
+        'custom-gray': '0 4px 20px rgba(156, 163, 175, 0.5)', // Exemplo com `gray-400` personalizado
+      },
   		colors: {
   			neutralSilver: '#F5F7FA',
   			borda: '#0063ff33',

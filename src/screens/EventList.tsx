@@ -57,7 +57,13 @@ const EventList = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [availableTimes, setAvailableTimes] = useState<
-    { _id: string; inicio: string; fim: string; status: string; duracao: number }[]
+    {
+      _id: string;
+      inicio: string;
+      fim: string;
+      status: string;
+      duracao: number;
+    }[]
   >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -137,7 +143,7 @@ const EventList = () => {
     }
     console.log("Agendamento ID definido:", agendamentoId);
     console.log("Horário ID definido:", horarioId);
-  
+
     // Atualizar o estado com os IDs de agendamento e horário
     setFormData({
       ...formData,
@@ -146,7 +152,7 @@ const EventList = () => {
     });
     setIsDialogOpen(true);
   };
-  
+
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setFormData({
@@ -292,45 +298,47 @@ const EventList = () => {
         {/* Direita: UserSheet para abrir o perfil */}
       </header>
       <div className="grid grid-cols-1 p-12 md:grid-cols-3 gap-4">
-       <div className="p-4 border rounded shadow-sm">
-  {selectedEvent ? (
-    <div>
-      <h2 className="text-xl font-bold mb-2">{selectedEvent.titulo}</h2>
-      <ScrollArea className="h-24 mb-2 bg-gray-100 rounded-lg">
-        <p>
-          <strong>Descrição:</strong> {selectedEvent.descricao}
-        </p>
-      </ScrollArea>
+        <div className="p-4 border rounded shadow-sm">
+          {selectedEvent ? (
+            <div>
+              <h2 className="text-xl font-bold mb-2">{selectedEvent.titulo}</h2>
+              <ScrollArea className="h-24 mb-2 bg-gray-100 rounded-lg">
+                <p>
+                  <strong>Descrição:</strong> {selectedEvent.descricao}
+                </p>
+              </ScrollArea>
 
-      <p>
-        <strong>Formato da Consulta:</strong> {selectedEvent.formatoConsulta}
-      </p>
-      <p>
-        <strong>Valor:</strong> R$ {selectedEvent.valor.toFixed(2)}
-      </p>
+              <p>
+                <strong>Formato da Consulta:</strong>{" "}
+                {selectedEvent.formatoConsulta}
+              </p>
+              <p>
+                <strong>Valor:</strong> R$ {selectedEvent.valor.toFixed(2)}
+              </p>
 
-      {selectedEvent.disponibilidade.map((disp, dispIndex) => (
-        <div key={dispIndex}>
-          <p>
-            <strong>Dia:</strong> {disp.dia}
-          </p>
-          <ul>
-            {disp.horarios.map((horario, horarioIndex) => (
-              <li key={horario._id}>
-                <strong>Horário:</strong> {horario.inicio} - {horario.fim}{" "}
-                <strong>Status:</strong> {horario.status}
-              </li>
-            ))}
-          </ul>
+              {selectedEvent.disponibilidade.map((disp, dispIndex) => (
+                <div key={dispIndex}>
+                  <p>
+                  <strong>Dia:</strong> {new Date(disp.dia).toLocaleDateString("pt-BR")}
+                  </p>
+                  <ul>
+                    {disp.horarios.map((horario, horarioIndex) => (
+                      <li key={horario._id}>
+                        <strong>Horário:</strong> {horario.inicio} -{" "}
+                        {horario.fim} <strong>Status:</strong> {horario.status}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>Selecione uma data para ver as informações da consulta.</p>
+          )}
         </div>
-      ))}
-    </div>
-  ) : (
-    <p>Selecione uma data para ver as informações da consulta.</p>
-  )}
-</div>
 
         <div className="p-4 border rounded shadow-sm">
+        
           <h2 className="text-xl font-semibold mb-4">
             Selecione uma Data & Hora
           </h2>
@@ -353,10 +361,12 @@ const EventList = () => {
         <div className="p-4 border rounded shadow-sm">
           {selectedDate ? (
             <div>
+                
               <h2 className="text-xl font-semibold mb-4">
                 Horários disponíveis para{" "}
                 {format(selectedDate, "PPPP", { locale: ptBR })}
               </h2>
+              <ScrollArea className="h-64">
               {availableTimes.length > 0 ? (
                 <ul className="space-y-2">
                   {availableTimes.map((time, index) => (
@@ -378,11 +388,21 @@ const EventList = () => {
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+                            className={`px-4 py-2 rounded ${
+                              time.status === "agendado"
+                                ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                                : "bg-blue-500 text-white hover:bg-blue-700"
+                            }`}
+                            disabled={time.status === "agendado"}
                             onClick={
-                              () =>
-                                selectedEvent &&
-                                handleOpenDialog(selectedEvent._id, time._id) // Passe o horário selecionado
+                              time.status !== "agendado"
+                                ? () =>
+                                    selectedEvent &&
+                                    handleOpenDialog(
+                                      selectedEvent._id,
+                                      time._id
+                                    )
+                                : undefined
                             }
                           >
                             Agendar
@@ -491,6 +511,7 @@ const EventList = () => {
               ) : (
                 <p>Nenhum horário disponível para a data selecionada.</p>
               )}
+              </ScrollArea>
             </div>
           ) : (
             <p>Selecione uma data para ver os horários disponíveis.</p>

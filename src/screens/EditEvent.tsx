@@ -32,13 +32,14 @@ import MainLayout from "@/components/MainLayout";
 type Disponibilidade = {
   dia: Date | string;
   horarios: {
+    _id: string;
     inicio: string;
     fim: string;
+    status: string;
     duracao: number;
-    reservado: boolean; // Novo campo adicionado
     paciente: string | null; // Novo campo adicionado
   }[];
-}
+};
 
 type FormDataType = {
   _id?: string;
@@ -47,7 +48,6 @@ type FormDataType = {
   descricao: string;
   pacienteEmail: string;
   formatoConsulta: string;
-  status: string;
   valor: string;
   repete: boolean;
   disponibilidade: Disponibilidade[];
@@ -63,18 +63,18 @@ const EditEvent = () => {
     descricao: "",
     pacienteEmail: "",
     formatoConsulta: "",
-    status: "",
     valor: "",
     repete: false,
     disponibilidade: [
       {
-        dia: new Date(), // ou uma string no formato YYYY-MM-DD
+        dia: new Date(), 
         horarios: [
           {
+            _id: "",
             inicio: "",
             fim: "",
             duracao: 1,
-            reservado: false, // Valor inicial padrão
+            status: "",
             paciente: null, // Valor inicial padrão
           },
         ],
@@ -96,9 +96,12 @@ const EditEvent = () => {
   const handleAddHorario = (dispIndex: any) => {
     const updatedDisponibilidade = [...formData.disponibilidade];
     updatedDisponibilidade[dispIndex].horarios.push({
+      _id: '',
       inicio: "",
       fim: "",
       duracao: 0,
+      status: "disponivel",
+      paciente: null,
     });
     setFormData({ ...formData, disponibilidade: updatedDisponibilidade });
   };
@@ -163,8 +166,17 @@ const EditEvent = () => {
       disponibilidade: [
         ...prevState.disponibilidade,
         {
-          dia: new Date(), // Inicializa com a data atual
-          horarios: [{ inicio: "", fim: "", duracao: 1 }],
+          dia: new Date().toISOString().split("T")[0], // Data no formato esperado
+          horarios: [
+            {
+              _id: "",
+              inicio: "",
+              fim: "",
+              duracao: 1,
+              status: "disponivel",
+              paciente: null,
+            },
+          ],
         },
       ],
     }));
@@ -204,17 +216,17 @@ const EditEvent = () => {
           descricao: response.data.descricao || "",
           pacienteEmail: response.data.pacienteEmail || "",
           formatoConsulta: response.data.formatoConsulta || "",
-          status: response.data.status || "",
           valor: response.data.valor ? String(response.data.valor) : "",
           repete: response.data.repete || false,
           disponibilidade: response.data.disponibilidade.map((disp: any) => ({
             dia: disp.dia,
             horarios: disp.horarios.map((horario: any) => ({
+              _id: horario._id,
               inicio: horario.inicio,
               fim: horario.fim,
               duracao: horario.duracao,
-              reservado: horario.reservado || false, // Certifique-se de incluir o valor
-              paciente: horario.paciente || null, // Certifique-se de incluir o valor
+              status: horario.status || "disponivel",
+              paciente: horario.paciente || null,
             })),
           })),
         });
@@ -229,86 +241,70 @@ const EditEvent = () => {
   // Função para salvar os dados atualizados
   const handleSave = async (e: any) => {
     e.preventDefault();
-  
-    const token = cookies.accessToken;
-    const authToken = cookies.authToken;
-  
+
+    const token = cookies.accessToken; // Token do Google
+    const authToken = cookies.authToken; // Token JWT
+
     if (!authToken) {
       console.error("Token JWT não encontrado.");
       return;
     }
-  
+
     try {
-      // Formatar disponibilidade para enviar corretamente ao backend
-      const formattedDisponibilidade = formData.disponibilidade.map((disp) => {
-        const diaFormatted =
-          disp.dia instanceof Date
-            ? disp.dia.toISOString().split("T")[0] // Se for Date, formatar para YYYY-MM-DD
-            : disp.dia;
-  
-        const horarios = disp.horarios.map((horario) => ({
+      // Formatar a disponibilidade
+      const formattedDisponibilidade = formData.disponibilidade.map((disp) => ({
+        dia:
+          typeof disp.dia === "string"
+            ? disp.dia.split("T")[0] // Remove a hora, mantendo apenas a data
+            : disp.dia instanceof Date
+            ? disp.dia.toISOString().split("T")[0]
+            : disp.dia, // Certifique-se de que sempre esteja no formato `YYYY-MM-DD`
+        horarios: disp.horarios.map((horario) => ({
+          _id: horario._id,
           inicio: horario.inicio,
           fim: horario.fim,
           duracao: horario.duracao,
-          reservado: horario.reservado ?? false, // Manter o campo `reservado`, padrão `false` se não especificado
-          paciente: horario.paciente ?? null, // Manter o campo `paciente`, padrão `null` se não especificado
-        }));
-  
-        return {
-          dia: diaFormatted,
-          horarios,
-        };
-      });
-  
-      // Criar o payload atualizado
+          status: horario.status || "disponivel",
+          paciente: horario.paciente ?? null,
+        })),
+      }));
+      
+
+      // Payload final
       const updatedData = {
         ...formData,
         disponibilidade: formattedDisponibilidade,
       };
-  
-      // Verificar se estamos atualizando no Google Calendar ou apenas no backend
-      if (googleCalendarId && googleCalendarId !== "undefined") {
-        // Atualizar evento no Google Calendar e backend
-        await axios.put(
-          `http://localhost:5000/calendar/event/${googleCalendarId}`,
-          updatedData,
-          {
-            withCredentials: true,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      } else if (_id && _id !== "undefined") {
-        // Atualizar apenas no backend usando _id
-        await axios.patch(
-          `http://localhost:5000/agendamentos/${_id}`,
-          updatedData,
-          {
-            withCredentials: true,
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
-      }
-  
+
+      // Atualizar ambos ao mesmo tempo (Google Calendar + Back-End)
+      await axios.put(
+        `http://localhost:5000/calendar/event/${_id}`, // Usar o `_id` do evento
+        updatedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Token Google para eventos
+            "x-auth-token": authToken, // Token JWT para autenticação adicional
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       toast({
         title: "Agendamento editado com sucesso",
-        description: "O agendamento foi editado com sucesso.",
+        description:
+          "O agendamento foi atualizado no Google Calendar e Back-End.",
       });
-  
-      navigate("/adm");
+
+      navigate("/adm"); // Redireciona para a página de administração
     } catch (error) {
       console.error("Erro ao atualizar o agendamento", error);
       toast({
         variant: "destructive",
         title: "Erro ao editar",
-        description: "Não foi possível editar o agendamento.",
+        description: "Não foi possível atualizar o agendamento.",
       });
     }
   };
-  
 
   return (
     <MainLayout>
@@ -344,7 +340,6 @@ const EditEvent = () => {
               </div>
               {/* E-mail do paciente */}
               <div>
-               
                 {googleCalendarId && (
                   <div>
                     <Label htmlFor="pacienteEmail">E-mail do Paciente</Label>
@@ -388,25 +383,42 @@ const EditEvent = () => {
               </div>
 
               {/* Status */}
-              <div className="flex space-x-4">
-                <Select
-                  value={formData.status} // Vinculando o valor do Select ao formData
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, status: value }))
-                  } // Atualizando o formData
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Selecione Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {/* Apenas as opções desejadas */}
-                    <SelectItem value="disponivel">disponível</SelectItem>
-                    <SelectItem value="cancelado">Cancelado</SelectItem>
-                    <SelectItem value="concluido">Concluído</SelectItem>
-                    <SelectItem value="ausente">Ausente</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* {formData.disponibilidade.map((disp, dispIndex) => (
+                <div key={dispIndex}>
+                
+                  {disp.horarios.map((horario, horarioIndex) => (
+                    <div key={horarioIndex}>
+                      <Select
+                        value={horario.status} // Acessa o status do horário específico
+                        onValueChange={(value) =>
+                          setFormData((prev) => {
+                            const updatedDisponibilidade = [
+                              ...prev.disponibilidade,
+                            ];
+                            updatedDisponibilidade[dispIndex].horarios[
+                              horarioIndex
+                            ].status = value;
+                            return {
+                              ...prev,
+                              disponibilidade: updatedDisponibilidade,
+                            };
+                          })
+                        }
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Selecione Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="disponivel">Disponível</SelectItem>
+                          <SelectItem value="cancelado">Cancelado</SelectItem>
+                          <SelectItem value="concluido">Concluído</SelectItem>
+                          <SelectItem value="ausente">Ausente</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ))}
+                </div>
+              ))}  */}
 
               {/* Valor */}
               <div>
