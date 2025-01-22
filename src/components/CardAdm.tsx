@@ -186,7 +186,8 @@ const CardAdm: React.FC<CardAdmProps> = ({
             },
           }
         );
-      } else {
+      } 
+      else {
         //  deletar somente no backend
         await axios.delete(`http://localhost:5000/agendamentos/${_id}`, {
           headers: {
@@ -325,12 +326,15 @@ const CardAdm: React.FC<CardAdmProps> = ({
           </div>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="start" className="w-96 p-4">
-          <ScrollArea className="h-96 scroll-smooth">
+        <DropdownMenuContent align="start" className="w-72 h-96 p-2 text-sm sm:w-80 md:-96 lg:w-104 ">
+          <ScrollArea className="h-80 scroll-smooth ">
             {disponibilidade && disponibilidade.length > 0 ? (
-              disponibilidade.map((dia: Disponibilidade, dispIndex) => (
+              disponibilidade.map((dia: 
+                
+                Disponibilidade, dispIndex) => (
                 <div key={dia.dia} className="mb-4">
                   {/* Data do dia */}
+                  
                   <p className="font-semibold text-gray-800 mb-2">
                     {new Date(dia.dia).toLocaleDateString("pt-BR")}
                   </p>
@@ -342,11 +346,11 @@ const CardAdm: React.FC<CardAdmProps> = ({
                     return (
                       <div
                         key={horario._id}
-                        className={`p-4 mb-3 border-2  rounded-md shadow-sm  ${borderColor} `}
+                        className={`p-2 mb-2 border-2  rounded-md shadow-sm  ${borderColor} `}
                       >
                         <div className="flex justify-between items-center">
                           {/* Horário */}
-                          <span className="text-sm font-medium text-gray-800">
+                          <span className="text-xs font-medium text-gray-800">
                             {horario.inicio} até {horario.fim}
                           </span>
 
@@ -358,7 +362,7 @@ const CardAdm: React.FC<CardAdmProps> = ({
                             }
                             onValueChange={(value) => handleStatusChange(horario._id, value)}
                           >
-                            <SelectTrigger className="w-[100px] h-[28px] text-xs bg-white border border-red-300 rounded-md shadow-sm">
+                            <SelectTrigger className="w-[80px] h-[24px] text-xs bg-white border border-red-300 rounded-md shadow-sm">
                               <SelectValue placeholder="Selecione Status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -398,16 +402,17 @@ const CardAdm: React.FC<CardAdmProps> = ({
             )}
           </ScrollArea>
 
-          {/* Botão Salvar */}
-          <div className="flex justify-end mt-4">
+         {/* Botão Salvar */}
+         <div className="flex justify-end mt-4">
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-3 py-2 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
               onClick={handleSave}
             >
               Salvar
             </button>
           </div>
         </DropdownMenuContent>
+         
       </DropdownMenu>
     </div>
   );

@@ -9,7 +9,7 @@ import Login from './screens/Login';
 import CreatEvent from './screens/CreateEvent';
 import EventList from './screens/EventList';
 import EditEvent from './screens/EditEvent';
-import Dashboard from './components/Dashboard';
+import Dashboard from './screens/Dashboard';
 
 
 
