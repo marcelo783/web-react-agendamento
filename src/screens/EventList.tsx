@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { ptBR } from "date-fns/locale";
 import { useCookies } from "react-cookie";
+import Cookies from "js-cookie"
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ErroImg from "../assets/person-calendar.png";
 import Header from "@/components/Header";
@@ -53,7 +54,7 @@ type FormDataType = {
 };
 
 const EventList = () => {
-  const [cookies] = useCookies(["accessToken"]);
+  const [cookies] = useCookies(["accessToken", "refreshToken"]);
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [availableTimes, setAvailableTimes] = useState<
@@ -171,15 +172,42 @@ const EventList = () => {
 
   const handleFormSubmit = async (e: any) => {
     e.preventDefault();
-
+  
     if (!formData.nome || !formData.email || !formData.telefone) {
-      console.error("Todos os campos são obrigatórios.");
+      console.error("❌ Todos os campos são obrigatórios.");
       return;
     }
-
+  
     try {
-      const accessToken = cookies["accessToken"];
-
+      let accessToken = Cookies.get("accessToken");
+  
+      if (!accessToken) {
+        console.log("🔄 Access token ausente. Tentando renovar usando refresh token...");
+  
+        try {
+          const refreshResponse = await axios.post(
+            "http://localhost:5000/auth/refresh",
+            {},
+            { withCredentials: true }
+          );
+  
+          console.log("✅ Novo accessToken recebido:", refreshResponse.data.accessToken);
+  
+          Cookies.set("accessToken", refreshResponse.data.accessToken, { expires: 0.5 });
+  
+          accessToken = refreshResponse.data.accessToken;
+        } catch (refreshError) {
+          console.error("❌ Erro ao renovar accessToken:", refreshError);
+          alert("Sua sessão expirou. Faça login novamente.");
+          window.location.href = "/login";
+          return;
+        }
+      }
+  
+      if (!accessToken) {
+        throw new Error("❌ Nenhum accessToken disponível para agendar.");
+      }
+  
       const response = await axios.patch(
         "http://localhost:5000/agendamentos/agendar",
         {
@@ -190,31 +218,30 @@ const EventList = () => {
           horarioId: formData.horarioId,
         },
         {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers: { Authorization: `Bearer ${accessToken}` },
+          withCredentials: true,
         }
       );
-
-      console.log("Resposta do servidor:", response.data);
-
+  
+      console.log("✅ Resposta do servidor:", response.data);
+  
       handleCloseDialog();
-
+  
       toast({
         title: "Agendamento criado com sucesso!",
         description: "O agendamento foi criado com sucesso.",
-        //status: "success",
       });
-    } catch (error) {
-      console.error("Erro ao enviar os dados do agendamento:", error);
+    } catch (error: any) {
+      console.error("❌ Erro geral:", error.message || error);
       toast({
         variant: "destructive",
         title: "Erro ao Agendar",
-        description: "Não foi possível fazer o agendamento!",
-        //action: <ToastAction altText="Try again">Try again</ToastAction>,
+        description: error.message || "Não foi possível fazer o agendamento!",
       });
     }
   };
+  
+  
 
   if (loading) {
     return (
